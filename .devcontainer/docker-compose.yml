@@ -10,7 +10,39 @@ services:
       - app-network
     ports:
       - "5173:5173"
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: sleep infinity
+    volumes:
+      - ../:/workspace:cached
+    environment:
+      HELLO: hello world!
+    networks:
+      - app-network
+    ports:
+      - "8000:8000"
+  database:
+    image: postgres:16
+    container_name: database
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db
+    networks:
+      - app-network
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 networks:
   app-network:
+    name: devcontainer_app-network
     driver: bridge
+
+volumes:
+  postgres_data:
+    name: devcontainer_postgres_data
