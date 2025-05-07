@@ -76,4 +76,4 @@ backend/
     ```
 3.  **各種コードの実装・修正:**
     * **ハンドラー (`internal/handler/`):** 生成された `ServerInterface` に変更があった場合、このディレクトリ内のハンドラー実装を修正または追加する。新しいエンドポイントのロジックなどを記述する。
-    * **ドメインロジック、データアクセス等:** 必要に応じて、`internal/domain/`, `internal/application/`, `internal/infrastructure/persistence/` などの関連コードを実装・修正する。
+    * **ドメインロジック、データアクセス等:** 必要に応じて、`internal/domain/`, `internal/application/`, `internal/infra/router` などの関連コードを実装・修正する。
