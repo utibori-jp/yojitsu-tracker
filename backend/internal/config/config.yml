@@ -1,2 +1,1 @@
 package: api
-output: internal/generated/api/api.gen.go    

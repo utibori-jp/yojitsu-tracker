@@ -69,9 +69,10 @@ backend/
 1.  **OpenAPI 定義の編集:**
     APIの仕様変更や追加が必要な場合は、まず `api/openapi.yml` ファイルを編集する。スキーマ、パス、操作などを定義・修正する。
 2.  **コード生成の実行:**
-    `openapi.yml` を編集した後、コンテナ内のターミナルで以下の Make コマンドを実行し、Go のコード (`internal/generated/api/api.gen.go` など) を再生成する。
+    `openapi.yml` を編集した後、コンテナ内のターミナルで以下の Make コマンドを実行し、Go のコード (`internal/generated/api.gen.go`、`internal/generated/types.gen.go`) を自動生成する。
     ```bash
-    make code-gen
+    make gen-api
+    make gen-type
     ```
 3.  **各種コードの実装・修正:**
     * **ハンドラー (`internal/handler/`):** 生成された `ServerInterface` に変更があった場合、このディレクトリ内のハンドラー実装を修正または追加する。新しいエンドポイントのロジックなどを記述する。
