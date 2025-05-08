@@ -3,27 +3,24 @@ import type { Todo } from "../types/todo";
 
 interface Props {
   todo: Todo;
-  onToggle: (id: number) => void;
-  onDelete: (id: number) => void;
 }
 
-const TodoItem: React.FC<Props> = ({ todo, onToggle, onDelete }) => {
+const TodoItem: React.FC<Props> = ({ todo }) => {
   return (
-    <div className="flex justify-between items-center p-2 border-b">
-      <div
-        className={`cursor-pointer ${
-          todo.completed ? "line-through text-gray-400" : ""
-        }`}
-        onClick={() => onToggle(todo.id)}
-      >
-        {todo.title}
+    <div className="border rounded-xl p-4 shadow-sm bg-white mb">
+      <div className="mb-2">
+        <h2 className="text-xl font-bold">{todo.name}</h2>
       </div>
-      <button
-        onClick={() => onDelete(todo.id)}
-        className="text-red-500 hover:text-red-700"
-      >
-        削除
-      </button>
+      <div className="flex space-x-4 mb-2">
+        <div className="border rounded px-1">{todo.priority.toUpperCase()}</div>
+        <div className="border rounded px-1">{todo.status}</div>
+        <div>期限: {todo.dueDate}</div>
+      </div>
+      <div>
+        <div>
+          予定: {todo.estimatedTime} 分 / 実績: {todo.actualTime} 分
+        </div>
+      </div>
     </div>
   );
 };

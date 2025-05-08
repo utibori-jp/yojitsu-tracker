@@ -1,35 +1,19 @@
-import React, { useState } from "react";
 import TodoItem from "./Todo";
 import type { Todo } from "../types/todo";
 
-const TodoList: React.FC = () => {
-  const [todos, setTodos] = useState<Todo[]>([
-    { id: 1, title: "買い物に行く", completed: false },
-    { id: 2, title: "宿題をやる", completed: true },
-  ]);
+interface Props {
+  todos: Todo[];
+}
 
-  const handleToggle = (id: number) => {
-    setTodos((prev) =>
-      prev.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
-  };
-
-  const handleDelete = (id: number) => {
-    setTodos((prev) => prev.filter((todo) => todo.id !== id));
-  };
+const TodoList: React.FC<Props> = ({ todos }) => {
+  if (todos.length === 0) {
+    return <p className="text-center text-gray-500">タスクはありません。</p>;
+  }
 
   return (
-    <div className="max-w-md mx-auto mt-8 bg-white shadow-md rounded p-4">
-      <h1 className="text-2xl font-bold mb-4">ToDo リスト</h1>
+    <div className="space-y-4">
       {todos.map((todo) => (
-        <TodoItem
-          key={todo.id}
-          todo={todo}
-          onToggle={handleToggle}
-          onDelete={handleDelete}
-        />
+        <TodoItem key={todo.id} todo={todo} />
       ))}
     </div>
   );
