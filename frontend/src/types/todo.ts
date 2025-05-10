@@ -1,10 +1,10 @@
 export interface Todo {
-  id: number;
+  id?: number;
   name: string;
-  description: string;
+  description?: string;
   estimatedTime: number;
   actualTime: number;
-  dueDate: string;
+  dueDate?: Date;
   priority: "low" | "medium" | "high";
   status: "todo" | "doing" | "pending" | "done";
 }
