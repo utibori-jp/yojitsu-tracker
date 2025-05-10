@@ -3,16 +3,47 @@ import TodoList from "../components/TodoList";
 import TodoForm from "../components/TodoForm";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
+<<<<<<< HEAD
 
 const Home: React.FC = () => {
   return (
     <main className="bg-gray-200 min-h-screen">
+=======
+
+const sampleTodos: Todo[] = [
+  {
+    id: 1,
+    name: "デザイン確認",
+    description: "トップページのUI確認",
+    estimatedTime: 2,
+    actualTime: 1,
+    dueDate: new Date("2025-05-15"),
+    priority: "medium",
+    status: "todo",
+  },
+  {
+    id: 2,
+    name: "API実装",
+    description: "タスク一覧取得のAPI実装",
+    estimatedTime: 3,
+    actualTime: 2.5,
+    dueDate: new Date("2025-05-16"),
+    priority: "high",
+    status: "doing",
+  },
+];
+
+const Home: React.FC = () => {
+  return (
+    <main className="bg-gray-200">
+>>>>>>> 0488818 (add: react-tab)
       <div className="bg-gray-800 p-4 shadow-md">
         <h1 className="text-white text-2xl font-bold text-center">
           予実 Tracker
         </h1>
       </div>
 
+<<<<<<< HEAD
       <Tabs className="p-4 max-w-5xl mx-auto">
         <TabList>
           <Tab>実行中タスク</Tab>
@@ -27,6 +58,22 @@ const Home: React.FC = () => {
         </TabPanel>
         <TabPanel>
           <h2>コンテンツ未実装</h2>
+=======
+      <Tabs>
+        <TabList>
+          <Tab>Title 1</Tab>
+          <Tab>Title 2</Tab>
+        </TabList>
+
+        <TabPanel className="p-4">
+          <div className="min-h-screen space-y-4">
+            <TodoForm />
+            <TodoList todos={sampleTodos} />
+          </div>
+        </TabPanel>
+        <TabPanel>
+          <h2>Any content 2</h2>
+>>>>>>> 0488818 (add: react-tab)
         </TabPanel>
       </Tabs>
     </main>
