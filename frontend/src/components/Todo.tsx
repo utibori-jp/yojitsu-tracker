@@ -14,7 +14,10 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
       <div className="flex space-x-4 mb-2">
         <div className="border rounded px-1">{todo.priority.toUpperCase()}</div>
         <div className="border rounded px-1">{todo.status}</div>
-        <div>期限: {todo.dueDate}</div>
+        <div>
+          期限:{" "}
+          {todo.dueDate ? todo.dueDate.toISOString().substring(0, 10) : ""}
+        </div>
       </div>
       <div>
         <div>

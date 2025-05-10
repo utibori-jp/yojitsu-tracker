@@ -104,7 +104,7 @@ const TodoForm: React.FC = () => {
               onChange={handleChange}
               value={
                 formData.dueDate
-                  ? formData.dueDate.toISOString().split("T")[0]
+                  ? formData.dueDate.toISOString().substring(0, 10)
                   : ""
               }
               className="w-full border border-gray-300 p-2 rounded-md"
