@@ -1,6 +1,7 @@
 import React from "react";
 import TodoList from "../components/TodoList";
 import { Todo } from "../types/todo";
+import TodoForm from "../components/TodoForm";
 
 const sampleTodos: Todo[] = [
   {
@@ -33,7 +34,8 @@ const Home: React.FC = () => {
           予実 Tracker
         </h1>
       </div>
-      <div className="min-h-screen bg-gray-100 p-4">
+      <div className="min-h-screen bg-gray-100 p-4 space-y-4">
+        <TodoForm />
         <TodoList todos={sampleTodos} />
       </div>
     </main>
