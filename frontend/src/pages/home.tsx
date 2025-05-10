@@ -61,12 +61,12 @@ const Home: React.FC = () => {
 =======
       <Tabs>
         <TabList>
-          <Tab>Title 1</Tab>
-          <Tab>Title 2</Tab>
+          <Tab>実行中タスク</Tab>
+          <Tab>完了タスク</Tab>
         </TabList>
 
-        <TabPanel className="p-4">
-          <div className="min-h-screen space-y-4">
+        <TabPanel>
+          <div className="space-y-4 mt-4">
             <TodoForm />
             <TodoList todos={sampleTodos} />
           </div>
