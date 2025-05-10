@@ -1,405 +1,890 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>予実トラッカー</title>
     <style>
-        /* --- GitHub風デザイン スタイル --- */
-        :root {
-            --color-bg-primary: #ffffff;
-            --color-bg-secondary: #f6f8fa;
-            --color-border-primary: #d0d7de;
-            --color-border-secondary: #eaecef;
-            --color-text-primary: #24292f;
-            --color-text-secondary: #57606a;
-            --color-text-link: #0969da;
-            --color-button-primary-bg: #2da44e;
-            --color-button-primary-text: #ffffff;
-            --color-button-primary-border: rgba(27, 31, 36, 0.15);
-            --color-button-primary-hover-bg: #2c974b;
-            --color-button-secondary-bg: #f6f8fa;
-            --color-button-secondary-text: #24292f;
-            --color-button-secondary-border: rgba(27, 31, 36, 0.15);
-            --color-button-secondary-hover-bg: #f3f4f6;
-            --color-button-danger-bg: #da3633;
-            --color-button-danger-text: #ffffff;
-            --color-button-danger-border: rgba(27, 31, 36, 0.15);
-            --color-button-danger-hover-bg: #cf222e;
-            --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            --border-radius: 6px;
-            --color-priority-high: #DB6161;
-            --color-priority-medium: #DDA74A;
-            --color-priority-low: #6E7781;
-            --color-status-todo: #6E7781;
-            --color-status-doing: #0969DA;
-            --color-status-pending: #BF8700;
-            --color-status-done: #1A7F37;
-        }
-        body { font-family: var(--font-family-sans-serif); margin: 0; background-color: var(--color-bg-secondary); color: var(--color-text-primary); line-height: 1.5; font-size: 14px; }
-        .container { max-width: 960px; margin: 0 auto; padding: 20px; }
-        header.app-header { background-color: #24292e; padding: 16px 0; margin-bottom: 24px; color: #ffffff; }
-        header.app-header h1 { text-align: center; margin: 0; font-size: 1.4em; font-weight: 600; }
-        .tab-navigation { display: flex; margin-bottom: 20px; border-bottom: 1px solid var(--color-border-primary); }
-        .tab-button { padding: 8px 16px; margin-bottom: -1px; border: 1px solid transparent; border-bottom: none; background-color: transparent; color: var(--color-text-secondary); cursor: pointer; font-size: 1em; font-weight: 500; border-radius: var(--border-radius) var(--border-radius) 0 0; transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease; }
-        .tab-button:hover { color: var(--color-text-primary); }
-        .tab-button.active { color: var(--color-text-primary); background-color: var(--color-bg-primary); border-color: var(--color-border-primary); font-weight: 600; }
-        .tab-content {}
-        .tab-pane { display: none; }
-        .tab-pane.active { display: block; }
-        .input-area { padding: 20px; background-color: var(--color-bg-primary); border: 1px solid var(--color-border-primary); border-radius: var(--border-radius); margin-bottom: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
-        .input-area .input-group { display: flex; flex-direction: column; }
-        .input-area .input-group.full-width { grid-column: 1 / -1; }
-        .input-area label { margin-bottom: 4px; font-weight: 500; font-size: 0.9em; color: var(--color-text-secondary); }
-        .input-area input[type="text"], .input-area input[type="number"], .input-area input[type="date"], .input-area select, .input-area textarea { width: 100%; padding: 8px 12px; border: 1px solid var(--color-border-primary); border-radius: var(--border-radius); font-size: 1em; box-sizing: border-box; font-family: inherit; }
-        .input-area textarea { min-height: 60px; resize: vertical; }
-        .input-area button#addTask { grid-column: 1 / -1; padding: 10px 16px; font-size: 1.05em; font-weight: 600; cursor: pointer; border-radius: var(--border-radius); border: 1px solid var(--color-button-primary-border); background-color: var(--color-button-primary-bg); color: var(--color-button-primary-text); transition: background-color 0.2s ease; }
-        .input-area button#addTask:hover { background-color: var(--color-button-primary-hover-bg); }
-        #taskList { list-style: none; padding: 0; margin: 0; }
-        #taskList li { padding: 16px; background-color: var(--color-bg-primary); border: 1px solid var(--color-border-primary); border-radius: var(--border-radius); margin-bottom: 16px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; }
-        #taskList li .task-main-info { grid-column: 1 / 2; }
-        #taskList li .task-actions {
-            grid-column: 2 / 3;
-            align-self: start;
-            display: flex;
-            flex-direction: row;
-            gap: 6px;
-        }
-        #taskList li .task-name { font-weight: 600; font-size: 1.1em; margin-bottom: 4px; display: block; }
-        #taskList li .task-description { font-size: 0.95em; color: var(--color-text-secondary); margin-bottom: 10px; white-space: pre-wrap; word-break: break-word; }
-        #taskList li .task-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.85em; color: var(--color-text-secondary); margin-bottom: 10px; }
-        #taskList li .task-meta span { display: inline-flex; align-items: center; }
-        #taskList li .task-meta .label { font-weight: 500; margin-right: 4px; }
-        #taskList li .priority-label, #taskList li .status-label { padding: 1px 8px; border-radius: 10px; font-weight: 500; color: var(--color-text-secondary); font-size: 0.8em; white-space: nowrap; border: 1px solid; background-color: transparent; display: inline-block; line-height: 1.4; margin-right: 6px; }
-        #taskList li .priority-high { border-color: var(--color-priority-high); color: var(--color-priority-high); }
-        #taskList li .priority-medium { border-color: var(--color-priority-medium); color: var(--color-priority-medium); }
-        #taskList li .priority-low { border-color: var(--color-priority-low); color: var(--color-priority-low); }
-        #taskList li .status-todo { border-color: var(--color-status-todo); color: var(--color-status-todo); }
-        #taskList li .status-doing { border-color: var(--color-status-doing); color: var(--color-status-doing); }
-        #taskList li .status-pending { border-color: var(--color-status-pending); color: var(--color-status-pending); }
-        #taskList li .task-time-info { font-size: 0.9em; color: var(--color-text-secondary); }
-        #taskList li .task-actions button {
-            width: 32px; /* 幅を固定 (アイコンサイズに合わせる) */
-            height: 32px; /* 高さを固定 */
-            padding: 0; /* パディングを削除 */
-            font-size: 0.875em; /* Tooltip用だが、アイコンサイズには影響しない */
-            cursor: pointer;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--color-button-secondary-border);
-            background-color: var(--color-button-secondary-bg);
-            color: var(--color-button-secondary-text); /* アイコンの色に影響 */
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-            display: inline-flex; /* アイコンを中央揃え */
-            align-items: center;
-            justify-content: center;
-            vertical-align: middle; /* 他の要素との縦位置調整 */
-        }
-        #taskList li .task-actions button:hover {
-            background-color: var(--color-button-secondary-hover-bg);
-            border-color: var(--color-border-primary);
-        }
-        /* SVGアイコンのスタイル */
-        #taskList li .task-actions button svg {
-            width: 16px; /* アイコンサイズ */
-            height: 16px;
-            vertical-align: middle; /* ボタン内での垂直中央揃え */
-        }
+      /* --- GitHub風デザイン スタイル --- */
+      :root {
+        --color-bg-primary: #ffffff;
+        --color-bg-secondary: #f6f8fa;
+        --color-border-primary: #d0d7de;
+        --color-border-secondary: #eaecef;
+        --color-text-primary: #24292f;
+        --color-text-secondary: #57606a;
+        --color-text-link: #0969da;
+        --color-button-primary-bg: #2da44e;
+        --color-button-primary-text: #ffffff;
+        --color-button-primary-border: rgba(27, 31, 36, 0.15);
+        --color-button-primary-hover-bg: #2c974b;
+        --color-button-secondary-bg: #f6f8fa;
+        --color-button-secondary-text: #24292f;
+        --color-button-secondary-border: rgba(27, 31, 36, 0.15);
+        --color-button-secondary-hover-bg: #f3f4f6;
+        --color-button-danger-bg: #da3633;
+        --color-button-danger-text: #ffffff;
+        --color-button-danger-border: rgba(27, 31, 36, 0.15);
+        --color-button-danger-hover-bg: #cf222e;
+        --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji",
+          "Segoe UI Emoji", "Segoe UI Symbol";
+        --border-radius: 6px;
+        --color-priority-high: #db6161;
+        --color-priority-medium: #dda74a;
+        --color-priority-low: #6e7781;
+        --color-status-todo: #6e7781;
+        --color-status-doing: #0969da;
+        --color-status-pending: #bf8700;
+        --color-status-done: #1a7f37;
+      }
+      body {
+        font-family: var(--font-family-sans-serif);
+        margin: 0;
+        background-color: var(--color-bg-secondary);
+        color: var(--color-text-primary);
+        line-height: 1.5;
+        font-size: 14px;
+      }
+      .container {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      header.app-header {
+        background-color: #24292e;
+        padding: 16px 0;
+        margin-bottom: 24px;
+        color: #ffffff;
+      }
+      header.app-header h1 {
+        text-align: center;
+        margin: 0;
+        font-size: 1.4em;
+        font-weight: 600;
+      }
+      .tab-navigation {
+        display: flex;
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--color-border-primary);
+      }
+      .tab-button {
+        padding: 8px 16px;
+        margin-bottom: -1px;
+        border: 1px solid transparent;
+        border-bottom: none;
+        background-color: transparent;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: 500;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        transition: color 0.2s ease, border-color 0.2s ease,
+          background-color 0.2s ease;
+      }
+      .tab-button:hover {
+        color: var(--color-text-primary);
+      }
+      .tab-button.active {
+        color: var(--color-text-primary);
+        background-color: var(--color-bg-primary);
+        border-color: var(--color-border-primary);
+        font-weight: 600;
+      }
+      .tab-content {
+      }
+      .tab-pane {
+        display: none;
+      }
+      .tab-pane.active {
+        display: block;
+      }
+      .input-area {
+        padding: 20px;
+        background-color: var(--color-bg-primary);
+        border: 1px solid var(--color-border-primary);
+        border-radius: var(--border-radius);
+        margin-bottom: 24px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+      }
+      .input-area .input-group {
+        display: flex;
+        flex-direction: column;
+      }
+      .input-area .input-group.full-width {
+        grid-column: 1 / -1;
+      }
+      .input-area label {
+        margin-bottom: 4px;
+        font-weight: 500;
+        font-size: 0.9em;
+        color: var(--color-text-secondary);
+      }
+      .input-area input[type="text"],
+      .input-area input[type="number"],
+      .input-area input[type="date"],
+      .input-area select,
+      .input-area textarea {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid var(--color-border-primary);
+        border-radius: var(--border-radius);
+        font-size: 1em;
+        box-sizing: border-box;
+        font-family: inherit;
+      }
+      .input-area textarea {
+        min-height: 60px;
+        resize: vertical;
+      }
+      .input-area button#addTask {
+        grid-column: 1 / -1;
+        padding: 10px 16px;
+        font-size: 1.05em;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--color-button-primary-border);
+        background-color: var(--color-button-primary-bg);
+        color: var(--color-button-primary-text);
+        transition: background-color 0.2s ease;
+      }
+      .input-area button#addTask:hover {
+        background-color: var(--color-button-primary-hover-bg);
+      }
+      #taskList {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      #taskList li {
+        padding: 16px;
+        background-color: var(--color-bg-primary);
+        border: 1px solid var(--color-border-primary);
+        border-radius: var(--border-radius);
+        margin-bottom: 16px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 16px;
+        align-items: start;
+      }
+      #taskList li .task-main-info {
+        grid-column: 1 / 2;
+      }
+      #taskList li .task-actions {
+        grid-column: 2 / 3;
+        align-self: start;
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+      }
+      #taskList li .task-name {
+        font-weight: 600;
+        font-size: 1.1em;
+        margin-bottom: 4px;
+        display: block;
+      }
+      #taskList li .task-description {
+        font-size: 0.95em;
+        color: var(--color-text-secondary);
+        margin-bottom: 10px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      #taskList li .task-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        font-size: 0.85em;
+        color: var(--color-text-secondary);
+        margin-bottom: 10px;
+      }
+      #taskList li .task-meta span {
+        display: inline-flex;
+        align-items: center;
+      }
+      #taskList li .task-meta .label {
+        font-weight: 500;
+        margin-right: 4px;
+      }
+      #taskList li .priority-label,
+      #taskList li .status-label {
+        padding: 1px 8px;
+        border-radius: 10px;
+        font-weight: 500;
+        color: var(--color-text-secondary);
+        font-size: 0.8em;
+        white-space: nowrap;
+        border: 1px solid;
+        background-color: transparent;
+        display: inline-block;
+        line-height: 1.4;
+        margin-right: 6px;
+      }
+      #taskList li .priority-high {
+        border-color: var(--color-priority-high);
+        color: var(--color-priority-high);
+      }
+      #taskList li .priority-medium {
+        border-color: var(--color-priority-medium);
+        color: var(--color-priority-medium);
+      }
+      #taskList li .priority-low {
+        border-color: var(--color-priority-low);
+        color: var(--color-priority-low);
+      }
+      #taskList li .status-todo {
+        border-color: var(--color-status-todo);
+        color: var(--color-status-todo);
+      }
+      #taskList li .status-doing {
+        border-color: var(--color-status-doing);
+        color: var(--color-status-doing);
+      }
+      #taskList li .status-pending {
+        border-color: var(--color-status-pending);
+        color: var(--color-status-pending);
+      }
+      #taskList li .task-time-info {
+        font-size: 0.9em;
+        color: var(--color-text-secondary);
+      }
+      #taskList li .task-actions button {
+        width: 32px; /* 幅を固定 (アイコンサイズに合わせる) */
+        height: 32px; /* 高さを固定 */
+        padding: 0; /* パディングを削除 */
+        font-size: 0.875em; /* Tooltip用だが、アイコンサイズには影響しない */
+        cursor: pointer;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--color-button-secondary-border);
+        background-color: var(--color-button-secondary-bg);
+        color: var(--color-button-secondary-text); /* アイコンの色に影響 */
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+        display: inline-flex; /* アイコンを中央揃え */
+        align-items: center;
+        justify-content: center;
+        vertical-align: middle; /* 他の要素との縦位置調整 */
+      }
+      #taskList li .task-actions button:hover {
+        background-color: var(--color-button-secondary-hover-bg);
+        border-color: var(--color-border-primary);
+      }
+      /* SVGアイコンのスタイル */
+      #taskList li .task-actions button svg {
+        width: 16px; /* アイコンサイズ */
+        height: 16px;
+        vertical-align: middle; /* ボタン内での垂直中央揃え */
+      }
 
-        /* 個別ボタンスタイル調整 */
-        #taskList li button.startStop {}
-        #taskList li button.startStop.running { background-color: #ffc107; border-color: rgba(27, 31, 36, 0.15); color: var(--color-text-primary); }
-        #taskList li button.startStop.running:hover { background-color: #e0a800; }
-        #taskList li button.complete { background-color: var(--color-button-primary-bg); color: var(--color-button-primary-text); border-color: var(--color-button-primary-border); }
-        #taskList li button.complete:hover { background-color: var(--color-button-primary-hover-bg); }
-        #taskList li button.delete { color: var(--color-button-danger-bg); } /* アイコンの色を赤に */
-        #taskList li button.delete:hover { border-color: var(--color-button-danger-border); color: var(--color-button-danger-hover-bg); background-color: var(--color-button-secondary-hover-bg); }
-        #taskList li button.editRunningButton { /* 編集ボタンのスタイル (通常ボタンと同じでOK) */ }
+      /* 個別ボタンスタイル調整 */
+      #taskList li button.startStop {
+      }
+      #taskList li button.startStop.running {
+        background-color: #ffc107;
+        border-color: rgba(27, 31, 36, 0.15);
+        color: var(--color-text-primary);
+      }
+      #taskList li button.startStop.running:hover {
+        background-color: #e0a800;
+      }
+      #taskList li button.complete {
+        background-color: var(--color-button-primary-bg);
+        color: var(--color-button-primary-text);
+        border-color: var(--color-button-primary-border);
+      }
+      #taskList li button.complete:hover {
+        background-color: var(--color-button-primary-hover-bg);
+      }
+      #taskList li button.delete {
+        color: var(--color-button-danger-bg);
+      } /* アイコンの色を赤に */
+      #taskList li button.delete:hover {
+        border-color: var(--color-button-danger-border);
+        color: var(--color-button-danger-hover-bg);
+        background-color: var(--color-button-secondary-hover-bg);
+      }
+      #taskList li button.editRunningButton {
+        /* 編集ボタンのスタイル (通常ボタンと同じでOK) */
+      }
 
+      /* 実行中タスク編集モード */
+      #taskList li.editing {
+        border-color: #eedc82;
+        background-color: #fffdef;
+        grid-template-columns: 1fr;
+      }
+      #taskList li.editing .task-actions {
+        display: none;
+      }
+      #taskList li.editing .edit-form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 16px;
+        justify-content: flex-end;
+      }
+      #taskList li.editing .edit-form-actions button {
+        width: auto;
+        padding: 6px 14px;
+      } /* 編集フォーム内のボタンはテキストあり */
+      #taskList li.editing label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 600;
+        font-size: 0.9em;
+        color: var(--color-text-primary);
+      }
+      #taskList li.editing input[type="text"],
+      #taskList li.editing input[type="number"],
+      #taskList li.editing input[type="date"],
+      #taskList li.editing select,
+      #taskList li.editing textarea {
+        width: 100%;
+        padding: 8px 12px;
+        margin-bottom: 12px;
+        border: 1px solid var(--color-border-primary);
+        border-radius: var(--border-radius);
+        box-sizing: border-box;
+        font-size: 1em;
+        font-family: inherit;
+      }
+      #taskList li.editing textarea {
+        min-height: 60px;
+        resize: vertical;
+      }
+      #taskList li.editing .time-inputs {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+      #taskList li.editing .time-inputs > div {
+        flex: 1;
+      }
+      #taskList li.editing .time-inputs input {
+        margin-bottom: 0;
+      }
 
-        /* 実行中タスク編集モード */
-        #taskList li.editing { border-color: #eedc82; background-color: #fffdef; grid-template-columns: 1fr; }
-        #taskList li.editing .task-actions { display: none; }
-        #taskList li.editing .edit-form-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: flex-end; }
-        #taskList li.editing .edit-form-actions button { width: auto; padding: 6px 14px; } /* 編集フォーム内のボタンはテキストあり */
-        #taskList li.editing label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.9em; color: var(--color-text-primary); }
-        #taskList li.editing input[type="text"], #taskList li.editing input[type="number"], #taskList li.editing input[type="date"], #taskList li.editing select, #taskList li.editing textarea { width: 100%; padding: 8px 12px; margin-bottom: 12px; border: 1px solid var(--color-border-primary); border-radius: var(--border-radius); box-sizing: border-box; font-size: 1em; font-family: inherit; }
-        #taskList li.editing textarea { min-height: 60px; resize: vertical; }
-        #taskList li.editing .time-inputs { display: flex; gap: 16px; margin-bottom: 12px; }
-        #taskList li.editing .time-inputs > div { flex: 1; }
-        #taskList li.editing .time-inputs input { margin-bottom: 0; }
+      /* 完了タスクリスト */
+      #completedTaskList {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      #completedTaskList li {
+        padding: 16px;
+        background-color: var(--color-bg-primary);
+        border: 1px solid var(--color-border-primary);
+        border-radius: var(--border-radius);
+        margin-bottom: 16px;
+      }
+      #completedTaskList li .task-header {
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 1.1em;
+      }
+      #completedTaskList li .task-description {
+        margin-bottom: 12px;
+        padding: 10px;
+        background-color: var(--color-bg-secondary);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--color-border-secondary);
+        color: var(--color-text-secondary);
+        font-size: 0.95em;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      #completedTaskList li .task-description.no-description {
+        color: #a0a0a0;
+        font-style: italic;
+      }
+      #completedTaskList li .task-memo {
+        margin-bottom: 12px;
+        font-size: 0.95em;
+        color: var(--color-text-primary);
+      }
+      #completedTaskList li .task-memo.no-memo {
+        color: #a0a0a0;
+        font-style: italic;
+      }
+      #completedTaskList li .task-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--color-border-secondary);
+      }
+      #completedTaskList li .time-display {
+        color: var(--color-text-secondary);
+        font-size: 0.9em;
+      }
+      #completedTaskList li .time-display span {
+        margin-right: 1em;
+      }
+      #completedTaskList li button.editButton,
+      #completedTaskList li button.saveButton {
+        padding: 6px 14px;
+        font-size: 0.9em;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--color-button-secondary-border);
+        background-color: var(--color-button-secondary-bg);
+        color: var(--color-button-secondary-text);
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+      }
+      #completedTaskList li button.editButton:hover {
+        background-color: var(--color-button-secondary-hover-bg);
+        border-color: var(--color-border-primary);
+      }
+      #completedTaskList li button.saveButton {
+        background-color: var(--color-button-primary-bg);
+        color: var(--color-button-primary-text);
+        border-color: var(--color-button-primary-border);
+      }
+      #completedTaskList li button.saveButton:hover {
+        background-color: var(--color-button-primary-hover-bg);
+      }
+      #completedTaskList li.editing {
+        background-color: #fffdef;
+        border-color: #eedc82;
+      }
+      #completedTaskList li label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 600;
+        font-size: 0.9em;
+        color: var(--color-text-primary);
+      }
+      #completedTaskList li input[type="text"],
+      #completedTaskList li input[type="number"],
+      #completedTaskList li textarea {
+        width: 100%;
+        padding: 8px 12px;
+        margin-bottom: 12px;
+        border: 1px solid var(--color-border-primary);
+        border-radius: var(--border-radius);
+        box-sizing: border-box;
+        font-size: 1em;
+        font-family: inherit;
+      }
+      #completedTaskList li textarea.taskDescriptionEdit {
+        min-height: 60px;
+        resize: vertical;
+      }
+      #completedTaskList li textarea.reflectionMemoEdit {
+        min-height: 80px;
+        resize: vertical;
+        margin-bottom: 16px;
+      }
+      #completedTaskList li .time-inputs {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+      #completedTaskList li .time-inputs > div {
+        flex: 1;
+      }
+      #completedTaskList li .time-inputs input {
+        margin-bottom: 0;
+      }
+      #completedTaskList li.editing .task-footer {
+        border-top: none;
+        padding-top: 0;
+        justify-content: flex-end;
+      }
 
-        /* 完了タスクリスト */
-        #completedTaskList { list-style: none; padding: 0; margin: 0; }
-        #completedTaskList li { padding: 16px; background-color: var(--color-bg-primary); border: 1px solid var(--color-border-primary); border-radius: var(--border-radius); margin-bottom: 16px; }
-        #completedTaskList li .task-header { font-weight: 600; margin-bottom: 8px; font-size: 1.1em; }
-        #completedTaskList li .task-description { margin-bottom: 12px; padding: 10px; background-color: var(--color-bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--color-border-secondary); color: var(--color-text-secondary); font-size: 0.95em; white-space: pre-wrap; word-break: break-word; }
-        #completedTaskList li .task-description.no-description { color: #a0a0a0; font-style: italic; }
-        #completedTaskList li .task-memo { margin-bottom: 12px; font-size: 0.95em; color: var(--color-text-primary); }
-        #completedTaskList li .task-memo.no-memo { color: #a0a0a0; font-style: italic; }
-        #completedTaskList li .task-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-border-secondary); }
-        #completedTaskList li .time-display { color: var(--color-text-secondary); font-size: 0.9em; }
-        #completedTaskList li .time-display span { margin-right: 1em; }
-        #completedTaskList li button.editButton, #completedTaskList li button.saveButton { padding: 6px 14px; font-size: 0.9em; font-weight: 500; cursor: pointer; border-radius: var(--border-radius); border: 1px solid var(--color-button-secondary-border); background-color: var(--color-button-secondary-bg); color: var(--color-button-secondary-text); transition: background-color 0.2s ease, border-color 0.2s ease; }
-        #completedTaskList li button.editButton:hover { background-color: var(--color-button-secondary-hover-bg); border-color: var(--color-border-primary); }
-        #completedTaskList li button.saveButton { background-color: var(--color-button-primary-bg); color: var(--color-button-primary-text); border-color: var(--color-button-primary-border); }
-        #completedTaskList li button.saveButton:hover { background-color: var(--color-button-primary-hover-bg); }
-        #completedTaskList li.editing { background-color: #fffdef; border-color: #eedc82; }
-        #completedTaskList li label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.9em; color: var(--color-text-primary); }
-        #completedTaskList li input[type="text"], #completedTaskList li input[type="number"], #completedTaskList li textarea { width: 100%; padding: 8px 12px; margin-bottom: 12px; border: 1px solid var(--color-border-primary); border-radius: var(--border-radius); box-sizing: border-box; font-size: 1em; font-family: inherit; }
-        #completedTaskList li textarea.taskDescriptionEdit { min-height: 60px; resize: vertical; }
-        #completedTaskList li textarea.reflectionMemoEdit { min-height: 80px; resize: vertical; margin-bottom: 16px; }
-        #completedTaskList li .time-inputs { display: flex; gap: 16px; margin-bottom: 12px; }
-        #completedTaskList li .time-inputs > div { flex: 1; }
-        #completedTaskList li .time-inputs input { margin-bottom: 0; }
-        #completedTaskList li.editing .task-footer { border-top: none; padding-top: 0; justify-content: flex-end; }
-
-        /* モーダル */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.4); }
-        .modal-content { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); background-color: var(--color-bg-primary); padding: 24px; border: 1px solid var(--color-border-primary); border-radius: var(--border-radius); box-shadow: 0 8px 24px rgba(140,149,159,0.2); width: 90%; max-width: 500px; }
-        .modal-content h2 { margin-top: 0; margin-bottom: 16px; font-size: 1.25em; font-weight: 600; }
-        .modal-content p { margin-top: 0; margin-bottom: 8px; color: var(--color-text-secondary); }
-        .modal-content p span { color: var(--color-text-primary); font-weight: 500; }
-        .close { position: absolute; top: 8px; right: 12px; color: var(--color-text-secondary); font-size: 24px; font-weight: bold; cursor: pointer; padding: 4px; line-height: 1; }
-        .close:hover, .close:focus { color: var(--color-text-primary); }
-        #reflectionMemo { width: 100%; box-sizing: border-box; height: 100px; margin-bottom: 16px; padding: 8px 12px; border: 1px solid var(--color-border-primary); border-radius: var(--border-radius); font-family: inherit; resize: vertical; font-size: 1em; }
-        #saveMemo { padding: 10px 16px; font-size: 1.05em; font-weight: 600; cursor: pointer; border-radius: var(--border-radius); border: 1px solid var(--color-button-primary-border); background-color: var(--color-button-primary-bg); color: var(--color-button-primary-text); transition: background-color 0.2s ease; display: block; width: 100%; box-sizing: border-box; }
-        #saveMemo:hover { background-color: var(--color-button-primary-hover-bg); }
+      /* モーダル */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+      .modal-content {
+        position: absolute;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: var(--color-bg-primary);
+        padding: 24px;
+        border: 1px solid var(--color-border-primary);
+        border-radius: var(--border-radius);
+        box-shadow: 0 8px 24px rgba(140, 149, 159, 0.2);
+        width: 90%;
+        max-width: 500px;
+      }
+      .modal-content h2 {
+        margin-top: 0;
+        margin-bottom: 16px;
+        font-size: 1.25em;
+        font-weight: 600;
+      }
+      .modal-content p {
+        margin-top: 0;
+        margin-bottom: 8px;
+        color: var(--color-text-secondary);
+      }
+      .modal-content p span {
+        color: var(--color-text-primary);
+        font-weight: 500;
+      }
+      .close {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        color: var(--color-text-secondary);
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        padding: 4px;
+        line-height: 1;
+      }
+      .close:hover,
+      .close:focus {
+        color: var(--color-text-primary);
+      }
+      #reflectionMemo {
+        width: 100%;
+        box-sizing: border-box;
+        height: 100px;
+        margin-bottom: 16px;
+        padding: 8px 12px;
+        border: 1px solid var(--color-border-primary);
+        border-radius: var(--border-radius);
+        font-family: inherit;
+        resize: vertical;
+        font-size: 1em;
+      }
+      #saveMemo {
+        padding: 10px 16px;
+        font-size: 1.05em;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--color-button-primary-border);
+        background-color: var(--color-button-primary-bg);
+        color: var(--color-button-primary-text);
+        transition: background-color 0.2s ease;
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      #saveMemo:hover {
+        background-color: var(--color-button-primary-hover-bg);
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <header class="app-header">
-        <h1>予実 Tracker</h1>
+      <h1>予実 Tracker</h1>
     </header>
 
     <div class="container">
-        <nav class="tab-navigation">
-            <button class="tab-button active" data-tab-target="#runningTasks">実行中タスク</button>
-            <button class="tab-button" data-tab-target="#completedTasks">完了タスク</button>
-        </nav>
+      <nav class="tab-navigation">
+        <button class="tab-button active" data-tab-target="#runningTasks">
+          実行中タスク
+        </button>
+        <button class="tab-button" data-tab-target="#completedTasks">
+          完了タスク
+        </button>
+      </nav>
 
-        <div class="tab-content">
-            <div id="runningTasks" class="tab-pane active">
-                <div class="input-area">
-                    <div class="input-group full-width">
-                        <label for="taskName">タスク名</label>
-                        <input type="text" id="taskName" placeholder="例: 資料作成">
-                    </div>
-                    <div class="input-group full-width">
-                        <label for="taskDescription">タスク説明 (任意)</label>
-                        <textarea id="taskDescription" placeholder="タスクの詳細な内容..."></textarea>
-                    </div>
-                    <div class="input-group">
-                        <label for="estimatedTime">予定時間 (分)</label>
-                        <input type="number" id="estimatedTime" placeholder="例: 60">
-                    </div>
-                    <div class="input-group">
-                        <label for="taskDueDate">期限 (任意)</label>
-                        <input type="date" id="taskDueDate">
-                    </div>
-                    <div class="input-group">
-                        <label for="taskPriority">優先度</label>
-                        <select id="taskPriority">
-                            <option value="medium" selected>中</option>
-                            <option value="high">高</option>
-                            <option value="low">低</option>
-                        </select>
-                    </div>
-                    <button id="addTask">タスク登録</button>
-                </div>
-                <ul id="taskList"></ul>
+      <div class="tab-content">
+        <div id="runningTasks" class="tab-pane active">
+          <div class="input-area">
+            <div class="input-group full-width">
+              <label for="taskName">タスク名</label>
+              <input type="text" id="taskName" placeholder="例: 資料作成" />
             </div>
-
-            <div id="completedTasks" class="tab-pane">
-                <ul id="completedTaskList"></ul>
+            <div class="input-group full-width">
+              <label for="taskDescription">タスク説明 (任意)</label>
+              <textarea
+                id="taskDescription"
+                placeholder="タスクの詳細な内容..."
+              ></textarea>
             </div>
+            <div class="input-group">
+              <label for="estimatedTime">予定時間 (分)</label>
+              <input type="number" id="estimatedTime" placeholder="例: 60" />
+            </div>
+            <div class="input-group">
+              <label for="taskDueDate">期限 (任意)</label>
+              <input type="date" id="taskDueDate" />
+            </div>
+            <div class="input-group">
+              <label for="taskPriority">優先度</label>
+              <select id="taskPriority">
+                <option value="medium" selected>中</option>
+                <option value="high">高</option>
+                <option value="low">低</option>
+              </select>
+            </div>
+            <button id="addTask">タスク登録</button>
+          </div>
+          <ul id="taskList"></ul>
         </div>
 
-        <div id="reflectionModal" class="modal">
-            <div class="modal-content">
-                <span class="close" title="閉じる">&times;</span>
-                <h2>反省メモ入力</h2>
-                <p>タスク名: <span id="completedTaskName"></span></p>
-                <p>予定時間: <span id="plannedTime"></span></p>
-                <p>実績時間: <span id="actualTime"></span></p>
-                <textarea id="reflectionMemo" placeholder="タスクの振り返りや反省点を入力..."></textarea>
-                <button id="saveMemo">保存して完了</button>
-            </div>
+        <div id="completedTasks" class="tab-pane">
+          <ul id="completedTaskList"></ul>
         </div>
+      </div>
 
+      <div id="reflectionModal" class="modal">
+        <div class="modal-content">
+          <span class="close" title="閉じる">&times;</span>
+          <h2>反省メモ入力</h2>
+          <p>タスク名: <span id="completedTaskName"></span></p>
+          <p>予定時間: <span id="plannedTime"></span></p>
+          <p>実績時間: <span id="actualTime"></span></p>
+          <textarea
+            id="reflectionMemo"
+            placeholder="タスクの振り返りや反省点を入力..."
+          ></textarea>
+          <button id="saveMemo">保存して完了</button>
+        </div>
+      </div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // --- DOM要素の取得 ---
-            const taskNameInput = document.getElementById('taskName');
-            const taskDescriptionInput = document.getElementById('taskDescription');
-            const estimatedTimeInput = document.getElementById('estimatedTime');
-            const taskDueDateInput = document.getElementById('taskDueDate');
-            const taskPriorityInput = document.getElementById('taskPriority');
-            const addTaskButton = document.getElementById('addTask');
-            const taskList = document.getElementById('taskList');
-            const completedTaskList = document.getElementById('completedTaskList');
-            const reflectionModal = document.getElementById('reflectionModal');
-            const completedTaskName = document.getElementById('completedTaskName');
-            const plannedTime = document.getElementById('plannedTime');
-            const actualTime = document.getElementById('actualTime');
-            const reflectionMemo = document.getElementById('reflectionMemo');
-            const saveMemoButton = document.getElementById('saveMemo');
-            const closeModalButton = reflectionModal.querySelector('.close');
-            const tabNavigation = document.querySelector('.tab-navigation');
-            const tabPanes = document.querySelectorAll('.tab-pane');
-            const inputArea = document.querySelector('.input-area');
+      document.addEventListener("DOMContentLoaded", function () {
+        // --- DOM要素の取得 ---
+        const taskNameInput = document.getElementById("taskName");
+        const taskDescriptionInput = document.getElementById("taskDescription");
+        const estimatedTimeInput = document.getElementById("estimatedTime");
+        const taskDueDateInput = document.getElementById("taskDueDate");
+        const taskPriorityInput = document.getElementById("taskPriority");
+        const addTaskButton = document.getElementById("addTask");
+        const taskList = document.getElementById("taskList");
+        const completedTaskList = document.getElementById("completedTaskList");
+        const reflectionModal = document.getElementById("reflectionModal");
+        const completedTaskName = document.getElementById("completedTaskName");
+        const plannedTime = document.getElementById("plannedTime");
+        const actualTime = document.getElementById("actualTime");
+        const reflectionMemo = document.getElementById("reflectionMemo");
+        const saveMemoButton = document.getElementById("saveMemo");
+        const closeModalButton = reflectionModal.querySelector(".close");
+        const tabNavigation = document.querySelector(".tab-navigation");
+        const tabPanes = document.querySelectorAll(".tab-pane");
+        const inputArea = document.querySelector(".input-area");
 
-            // --- 定数 ---
-            const UPDATE_INTERVAL_MS = 1000;
-            const Priority = { HIGH: 'high', MEDIUM: 'medium', LOW: 'low' };
-            const Status = { TODO: 'todo', DOING: 'doing', PENDING: 'pending', DONE: 'done' };
+        // --- 定数 ---
+        const UPDATE_INTERVAL_MS = 1000;
+        const Priority = { HIGH: "high", MEDIUM: "medium", LOW: "low" };
+        const Status = {
+          TODO: "todo",
+          DOING: "doing",
+          PENDING: "pending",
+          DONE: "done",
+        };
 
-            // --- 状態管理 ---
-            let tasks = loadTasks();
-            let runningTaskUpdateTimer = null;
+        // --- 状態管理 ---
+        let tasks = loadTasks();
+        let runningTaskUpdateTimer = null;
 
+        // --- 関数定義 ---
 
-            // --- 関数定義 ---
+        /** localStorageからタスクを読み込み、互換性対応 */
+        function loadTasks() {
+          const storedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+          return storedTasks.map((task) => ({
+            id: task.id || Date.now() + Math.random(),
+            name: task.name || "",
+            description: task.description || "",
+            estimatedTime: task.estimatedTime || 0,
+            actualTime: task.actualTime || 0,
+            dueDate: task.dueDate || null,
+            priority: task.priority || Priority.MEDIUM,
+            status: task.status || (task.completed ? Status.DONE : Status.TODO),
+            startTime: task.startTime || null,
+            reflectionMemo: task.reflectionMemo || "",
+          }));
+        }
 
-            /** localStorageからタスクを読み込み、互換性対応 */
-            function loadTasks() {
-                const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-                return storedTasks.map(task => ({
-                    id: task.id || Date.now() + Math.random(),
-                    name: task.name || '',
-                    description: task.description || '',
-                    estimatedTime: task.estimatedTime || 0,
-                    actualTime: task.actualTime || 0,
-                    dueDate: task.dueDate || null,
-                    priority: task.priority || Priority.MEDIUM,
-                    status: task.status || (task.completed ? Status.DONE : Status.TODO),
-                    startTime: task.startTime || null,
-                    reflectionMemo: task.reflectionMemo || '',
-                }));
-            }
+        /** localStorageにタスクデータを保存 */
+        function saveTasks() {
+          const tasksToSave = tasks.map(({ intervalId, ...rest }) => rest);
+          try {
+            localStorage.setItem("tasks", JSON.stringify(tasksToSave));
+          } catch (error) {
+            console.error("localStorageへの保存に失敗:", error);
+          }
+        }
 
-            /** localStorageにタスクデータを保存 */
-            function saveTasks() {
-                const tasksToSave = tasks.map(({ intervalId, ...rest }) => rest);
-                try {
-                    localStorage.setItem('tasks', JSON.stringify(tasksToSave));
-                } catch (error) { console.error("localStorageへの保存に失敗:", error); }
-            }
+        /** 時間(分)を HH:MM:SS 形式にフォーマット */
+        function formatTime(totalMinutes) {
+          if (totalMinutes == null || isNaN(totalMinutes) || totalMinutes < 0)
+            return "N/A";
+          const totalSeconds = Math.round(totalMinutes * 60);
+          const hours = Math.floor(totalSeconds / 3600);
+          const minutes = Math.floor((totalSeconds % 3600) / 60);
+          const seconds = totalSeconds % 60;
+          return `${String(hours).padStart(
+            2,
+            "0"
+          )}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+        }
 
-            /** 時間(分)を HH:MM:SS 形式にフォーマット */
-            function formatTime(totalMinutes) {
-                if (totalMinutes == null || isNaN(totalMinutes) || totalMinutes < 0) return 'N/A';
-                const totalSeconds = Math.round(totalMinutes * 60);
-                const hours = Math.floor(totalSeconds / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
-                return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-            }
+        /** HTML文字列をエスケープ */
+        function escapeHTML(str) {
+          if (typeof str !== "string") return "";
+          return str
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        }
 
-            /** HTML文字列をエスケープ */
-            function escapeHTML(str) {
-                if (typeof str !== 'string') return '';
-                return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-            }
+        /** 優先度の表示テキストを取得 */
+        function getPriorityText(priority) {
+          switch (priority) {
+            case Priority.HIGH:
+              return "高";
+            case Priority.MEDIUM:
+              return "中";
+            case Priority.LOW:
+              return "低";
+            default:
+              return "不明";
+          }
+        }
 
-            /** 優先度の表示テキストを取得 */
-            function getPriorityText(priority) {
-                switch (priority) {
-                    case Priority.HIGH: return '高';
-                    case Priority.MEDIUM: return '中';
-                    case Priority.LOW: return '低';
-                    default: return '不明';
-                }
-            }
+        /** ステータスの表示テキストを取得 */
+        function getStatusText(status) {
+          switch (status) {
+            case Status.TODO:
+              return "未着手";
+            case Status.DOING:
+              return "進行中";
+            case Status.PENDING:
+              return "保留中";
+            case Status.DONE:
+              return "完了";
+            default:
+              return "不明";
+          }
+        }
 
-            /** ステータスの表示テキストを取得 */
-            function getStatusText(status) {
-                 switch (status) {
-                    case Status.TODO: return '未着手';
-                    case Status.DOING: return '進行中';
-                    case Status.PENDING: return '保留中';
-                    case Status.DONE: return '完了';
-                    default: return '不明';
-                }
-            }
+        // ★★★ SVGアイコン定義 ★★★
+        const ICONS = {
+          play: `<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M4.5 12.5v-9l7 4.5-7 4.5z"/></svg>`,
+          stop: `<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M4 4h8v8H4z"/></svg>`,
+          check: `<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/></svg>`,
+          trash: `<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M11 1.75V3h-6V1.75a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75zM10.5 3V1.75h-5V3h5zM2.5 4a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-11zM3.91 6.5a.5.5 0 0 1 .49.59l.5 5a.5.5 0 0 1-.98.1l-.5-5a.5.5 0 0 1 .49-.59zM8 7a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0v-5A.5.5 0 0 1 8 7zm3.59 0a.5.5 0 0 0-.49.59l-.5 5a.5.5 0 1 0 .98.1l.5-5a.5.5 0 0 0-.49-.59z"/></svg>`,
+          pencil: `<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V12h2.293l6.5-6.5z"/></svg>`,
+        };
 
-            // ★★★ SVGアイコン定義 ★★★
-            const ICONS = {
-                play: `<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M4.5 12.5v-9l7 4.5-7 4.5z"/></svg>`,
-                stop: `<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M4 4h8v8H4z"/></svg>`,
-                check: `<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/></svg>`,
-                trash: `<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M11 1.75V3h-6V1.75a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75zM10.5 3V1.75h-5V3h5zM2.5 4a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-11zM3.91 6.5a.5.5 0 0 1 .49.59l.5 5a.5.5 0 0 1-.98.1l-.5-5a.5.5 0 0 1 .49-.59zM8 7a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0v-5A.5.5 0 0 1 8 7zm3.59 0a.5.5 0 0 0-.49.59l-.5 5a.5.5 0 1 0 .98.1l.5-5a.5.5 0 0 0-.49-.59z"/></svg>`,
-                pencil: `<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V12h2.293l6.5-6.5z"/></svg>`
-            };
+        /** 実行中タスクリスト項目(li)を作成 (表示モード) */
+        function createRunningTaskListItem(task, index) {
+          const listItem = document.createElement("li");
+          listItem.dataset.index = index;
+          renderRunningTaskListItem(listItem, task, index);
+          return listItem;
+        }
 
+        /** 実行中タスクリスト項目(li)の内容を描画 (表示モード) */
+        function renderRunningTaskListItem(listItem, task, index) {
+          if (!task) {
+            console.error(`Task at index ${index} is undefined or null.`);
+            listItem.innerHTML =
+              "<li>エラー: タスクデータの読み込みに失敗しました</li>";
+            return;
+          }
+          const actualTimeFormatted = formatTime(task.actualTime || 0);
+          // ★★★ イコンとクラスを動的に設定 ★★★
+          const isDoing = task.status === Status.DOING;
+          const startStopIcon = isDoing ? ICONS.stop : ICONS.play;
+          const startStopButtonClass = isDoing
+            ? "startStop running"
+            : "startStop";
+          const startStopTitle = isDoing ? "停止" : "開始";
 
-            /** 実行中タスクリスト項目(li)を作成 (表示モード) */
-            function createRunningTaskListItem(task, index) {
-                const listItem = document.createElement('li');
-                listItem.dataset.index = index;
-                renderRunningTaskListItem(listItem, task, index);
-                return listItem;
-            }
+          const taskNameEscaped = escapeHTML(task.name);
+          const descriptionEscaped = escapeHTML(task.description);
+          const dueDateFormatted = task.dueDate ? task.dueDate : "未設定";
+          const priorityText = getPriorityText(task.priority);
+          const statusText = getStatusText(task.status);
 
-            /** 実行中タスクリスト項目(li)の内容を描画 (表示モード) */
-            function renderRunningTaskListItem(listItem, task, index) {
-                if (!task) { console.error(`Task at index ${index} is undefined or null.`); listItem.innerHTML = '<li>エラー: タスクデータの読み込みに失敗しました</li>'; return; }
-                const actualTimeFormatted = formatTime(task.actualTime || 0);
-                // ★★★ イコンとクラスを動的に設定 ★★★
-                const isDoing = task.status === Status.DOING;
-                const startStopIcon = isDoing ? ICONS.stop : ICONS.play;
-                const startStopButtonClass = isDoing ? 'startStop running' : 'startStop';
-                const startStopTitle = isDoing ? '停止' : '開始';
-
-                const taskNameEscaped = escapeHTML(task.name);
-                const descriptionEscaped = escapeHTML(task.description);
-                const dueDateFormatted = task.dueDate ? task.dueDate : '未設定';
-                const priorityText = getPriorityText(task.priority);
-                const statusText = getStatusText(task.status);
-
-                listItem.innerHTML = `
+          listItem.innerHTML = `
                     <div class="task-main-info">
                         <span class="task-name">${taskNameEscaped}</span>
                         <div class="task-meta">
-                            <span class="priority-label ${task.priority}">${priorityText}</span>
-                            <span class="status-label ${task.status}">${statusText}</span>
+                            <span class="priority-label ${
+                              task.priority
+                            }">${priorityText}</span>
+                            <span class="status-label ${
+                              task.status
+                            }">${statusText}</span>
                             <span><span class="label">期限:</span> ${dueDateFormatted}</span>
                         </div>
-                        ${descriptionEscaped ? `<div class="task-description">${descriptionEscaped.replace(/\n/g, '<br>')}</div>` : ''}
+                        ${
+                          descriptionEscaped
+                            ? `<div class="task-description">${descriptionEscaped.replace(
+                                /\n/g,
+                                "<br>"
+                              )}</div>`
+                            : ""
+                        }
                         <div class="task-time-info">
-                            <span>予定: ${task.estimatedTime}分</span> / <span>実績: ${actualTimeFormatted}</span>
+                            <span>予定: ${
+                              task.estimatedTime
+                            }分</span> / <span>実績: ${actualTimeFormatted}</span>
                         </div>
                     </div>
                     <div class="task-actions">
                         <button class="${startStopButtonClass}" data-index="${index}" title="${startStopTitle}">${startStopIcon}</button>
-                        <button class="complete" data-index="${index}" title="完了">${ICONS.check}</button>
-                        <button class="delete" data-index="${index}" title="削除">${ICONS.trash}</button>
-                        <button class="editRunningButton" data-index="${index}" title="編集">${ICONS.pencil}</button>
+                        <button class="complete" data-index="${index}" title="完了">${
+            ICONS.check
+          }</button>
+                        <button class="delete" data-index="${index}" title="削除">${
+            ICONS.trash
+          }</button>
+                        <button class="editRunningButton" data-index="${index}" title="編集">${
+            ICONS.pencil
+          }</button>
                     </div>
                 `;
-                listItem.classList.remove('editing');
-                listItem.dataset.index = index;
-            }
+          listItem.classList.remove("editing");
+          listItem.dataset.index = index;
+        }
 
+        /** 完了タスクリスト項目(li)を作成 */
+        function createCompletedTaskListItem(task, index) {
+          const listItem = document.createElement("li");
+          listItem.dataset.taskIndex = index;
+          renderCompletedTaskListItem(listItem, task, index);
+          return listItem;
+        }
 
-            /** 完了タスクリスト項目(li)を作成 */
-            function createCompletedTaskListItem(task, index) {
-                 const listItem = document.createElement('li');
-                 listItem.dataset.taskIndex = index;
-                 renderCompletedTaskListItem(listItem, task, index);
-                 return listItem;
-            }
+        /** 完了タスクリスト項目(li)の内容を描画 (表示モード) */
+        function renderCompletedTaskListItem(listItem, task, index) {
+          if (!task) {
+            console.error(
+              `Completed task at index ${index} is undefined or null.`
+            );
+            listItem.innerHTML =
+              "<li>エラー: 完了タスクデータの読み込みに失敗しました</li>";
+            return;
+          }
+          const estimatedTimeDisplay = formatTime(task.estimatedTime);
+          const actualTimeDisplay = formatTime(task.actualTime);
+          const taskNameHtml = escapeHTML(task.name);
+          const descriptionHtml = task.description
+            ? escapeHTML(task.description).replace(/\n/g, "<br>")
+            : '<span class="no-description">タスク説明はありません</span>';
+          const memoHtml = task.reflectionMemo
+            ? escapeHTML(task.reflectionMemo).replace(/\n/g, "<br>")
+            : '<span class="no-memo">反省メモはありません</span>';
 
-            /** 完了タスクリスト項目(li)の内容を描画 (表示モード) */
-            function renderCompletedTaskListItem(listItem, task, index) {
-                 if (!task) { console.error(`Completed task at index ${index} is undefined or null.`); listItem.innerHTML = '<li>エラー: 完了タスクデータの読み込みに失敗しました</li>'; return; }
-                 const estimatedTimeDisplay = formatTime(task.estimatedTime);
-                 const actualTimeDisplay = formatTime(task.actualTime);
-                 const taskNameHtml = escapeHTML(task.name);
-                 const descriptionHtml = task.description ? escapeHTML(task.description).replace(/\n/g, '<br>') : '<span class="no-description">タスク説明はありません</span>';
-                 const memoHtml = task.reflectionMemo ? escapeHTML(task.reflectionMemo).replace(/\n/g, '<br>') : '<span class="no-memo">反省メモはありません</span>';
-
-                 listItem.innerHTML = `
+          listItem.innerHTML = `
                     <div class="task-header">${taskNameHtml}</div>
                     <div class="task-description">${descriptionHtml}</div>
                     <div class="task-memo"><strong>反省メモ:</strong><div style="margin-top: 4px;">${memoHtml}</div></div>
@@ -410,244 +895,361 @@
                         </div>
                         <button class="editButton" data-index="${index}" title="編集">${ICONS.pencil}</button> </div>
                  `;
-                 listItem.classList.remove('editing');
-                 listItem.dataset.taskIndex = index;
+          listItem.classList.remove("editing");
+          listItem.dataset.taskIndex = index;
+        }
+
+        /** 実行中タスクリストの表示を更新 */
+        function updateRunningTaskList() {
+          taskList.innerHTML = "";
+          tasks.forEach((task, index) => {
+            if (task && task.status !== Status.DONE) {
+              const listItem = createRunningTaskListItem(task, index);
+              taskList.appendChild(listItem);
             }
+          });
+        }
 
-            /** 実行中タスクリストの表示を更新 */
-            function updateRunningTaskList() {
-                taskList.innerHTML = '';
-                tasks.forEach((task, index) => {
-                    if (task && task.status !== Status.DONE) {
-                        const listItem = createRunningTaskListItem(task, index);
-                        taskList.appendChild(listItem);
-                    }
-                });
+        /** 完了タスクリストの表示を更新 */
+        function updateCompletedTaskList() {
+          completedTaskList.innerHTML = "";
+          tasks.forEach((task, index) => {
+            if (task && task.status === Status.DONE) {
+              const listItem = createCompletedTaskListItem(task, index);
+              completedTaskList.appendChild(listItem);
             }
+          });
+        }
 
-            /** 完了タスクリストの表示を更新 */
-            function updateCompletedTaskList() {
-                completedTaskList.innerHTML = '';
-                tasks.forEach((task, index) => {
-                    if (task && task.status === Status.DONE) {
-                        const listItem = createCompletedTaskListItem(task, index);
-                        completedTaskList.appendChild(listItem);
-                    }
-                });
+        /** 全リスト表示を更新 */
+        function updateAllLists() {
+          updateRunningTaskList();
+          updateCompletedTaskList();
+        }
+
+        /** 新しいタスクを追加 */
+        function addTask() {
+          const taskName = taskNameInput.value.trim();
+          const description = taskDescriptionInput.value.trim();
+          const estimatedTime = parseInt(estimatedTimeInput.value, 10);
+          const dueDate = taskDueDateInput.value || null;
+          const priority = taskPriorityInput.value;
+
+          if (taskName === "") {
+            alert("タスク名を入力してください。");
+            taskNameInput.focus();
+            return;
+          }
+          if (isNaN(estimatedTime) || estimatedTime <= 0) {
+            alert("有効な予定時間（正の分数）を入力してください。");
+            estimatedTimeInput.focus();
+            return;
+          }
+
+          const newTask = {
+            id: Date.now() + Math.random(),
+            name: taskName,
+            description: description,
+            estimatedTime: estimatedTime,
+            actualTime: 0,
+            dueDate: dueDate,
+            priority: priority,
+            status: Status.TODO,
+            startTime: null,
+            reflectionMemo: "",
+          };
+          tasks.push(newTask);
+          saveTasks();
+          updateRunningTaskList();
+          taskNameInput.value = "";
+          taskDescriptionInput.value = "";
+          estimatedTimeInput.value = "";
+          taskDueDateInput.value = "";
+          taskPriorityInput.value = Priority.MEDIUM;
+          taskNameInput.focus();
+        }
+
+        /** タスクの計測を開始/停止 */
+        function startStopTask(index) {
+          const task = tasks[index];
+          if (!task || task.status === Status.DONE) {
+            console.warn(
+              `startStopTask called on invalid or done task at index ${index}`
+            );
+            return;
+          }
+
+          if (task.status === Status.DOING) {
+            task.status = Status.TODO;
+            if (task.intervalId) {
+              clearInterval(task.intervalId);
+              task.intervalId = null;
             }
+          } else {
+            task.status = Status.DOING;
+            task.startTime = Date.now();
+            if (task.intervalId) clearInterval(task.intervalId);
+            task.intervalId = setInterval(() => {
+              const currentTask = tasks[index];
+              if (currentTask && currentTask.status === Status.DOING) {
+                currentTask.actualTime += 1 / 60;
+              } else {
+                if (task.intervalId) clearInterval(task.intervalId);
+                task.intervalId = null;
+              }
+            }, 1000);
+          }
+          saveTasks();
+          updateRunningTaskList();
+        }
 
+        /** タスクを完了にする (モーダル表示) */
+        function completeTask(index) {
+          const task = tasks[index];
+          if (!task || task.status === Status.DONE) {
+            console.warn(
+              `completeTask called on invalid or done task at index ${index}`
+            );
+            return;
+          }
 
-            /** 全リスト表示を更新 */
-            function updateAllLists() {
-                updateRunningTaskList();
-                updateCompletedTaskList();
-            }
+          if (task.status === Status.DOING) startStopTask(index); // 実行中なら停止
 
-            /** 新しいタスクを追加 */
-            function addTask() {
-                const taskName = taskNameInput.value.trim();
-                const description = taskDescriptionInput.value.trim();
-                const estimatedTime = parseInt(estimatedTimeInput.value, 10);
-                const dueDate = taskDueDateInput.value || null;
-                const priority = taskPriorityInput.value;
+          completedTaskName.textContent = task.name;
+          plannedTime.textContent = formatTime(task.estimatedTime);
+          actualTime.textContent = formatTime(task.actualTime || 0);
+          reflectionMemo.value = task.reflectionMemo || "";
+          saveMemoButton.dataset.index = index;
+          reflectionModal.style.display = "block";
+          reflectionMemo.focus();
+        }
 
-                if (taskName === '') { alert('タスク名を入力してください。'); taskNameInput.focus(); return; }
-                if (isNaN(estimatedTime) || estimatedTime <= 0) { alert('有効な予定時間（正の分数）を入力してください。'); estimatedTimeInput.focus(); return; }
+        /** 反省メモを保存しタスクを完了状態にする */
+        function saveReflectionAndComplete() {
+          const index = parseInt(saveMemoButton.dataset.index, 10);
+          if (isNaN(index) || !tasks[index]) {
+            console.error(
+              "Invalid index for saveReflectionAndComplete:",
+              index
+            );
+            closeModal();
+            return;
+          }
 
-                const newTask = {
-                    id: Date.now() + Math.random(),
-                    name: taskName, description: description, estimatedTime: estimatedTime,
-                    actualTime: 0, dueDate: dueDate, priority: priority, status: Status.TODO,
-                    startTime: null, reflectionMemo: ''
-                };
-                tasks.push(newTask);
-                saveTasks();
-                updateRunningTaskList();
-                taskNameInput.value = ''; taskDescriptionInput.value = ''; estimatedTimeInput.value = '';
-                taskDueDateInput.value = ''; taskPriorityInput.value = Priority.MEDIUM;
-                taskNameInput.focus();
-            }
+          const task = tasks[index];
+          task.reflectionMemo = reflectionMemo.value.trim();
+          task.status = Status.DONE;
+          if (task.intervalId) {
+            clearInterval(task.intervalId);
+            task.intervalId = null;
+          }
 
-            /** タスクの計測を開始/停止 */
-            function startStopTask(index) {
-                const task = tasks[index];
-                if (!task || task.status === Status.DONE) { console.warn(`startStopTask called on invalid or done task at index ${index}`); return; }
+          saveTasks();
+          updateRunningTaskList();
+          updateCompletedTaskList();
+          closeModal();
+        }
 
-                if (task.status === Status.DOING) {
-                    task.status = Status.TODO;
-                    if (task.intervalId) { clearInterval(task.intervalId); task.intervalId = null; }
-                } else {
-                    task.status = Status.DOING;
-                    task.startTime = Date.now();
-                    if (task.intervalId) clearInterval(task.intervalId);
-                    task.intervalId = setInterval(() => {
-                        const currentTask = tasks[index];
-                        if (currentTask && currentTask.status === Status.DOING) {
-                            currentTask.actualTime += 1 / 60;
-                        } else {
-                            if (task.intervalId) clearInterval(task.intervalId);
-                            task.intervalId = null;
-                        }
-                    }, 1000);
-                }
-                saveTasks();
-                updateRunningTaskList();
-            }
+        /** タスクを削除 */
+        function deleteTask(index) {
+          const task = tasks[index];
+          if (!task) {
+            console.warn(`deleteTask called on invalid task at index ${index}`);
+            return;
+          }
+          if (task.status === Status.DOING && task.intervalId) {
+            clearInterval(task.intervalId);
+            task.intervalId = null;
+          }
+          tasks.splice(index, 1);
+          saveTasks();
+          updateRunningTaskList();
+        }
 
+        /** モーダルを閉じる */
+        function closeModal() {
+          reflectionModal.style.display = "none";
+          reflectionMemo.value = "";
+        }
 
-            /** タスクを完了にする (モーダル表示) */
-            function completeTask(index) {
-                const task = tasks[index];
-                if (!task || task.status === Status.DONE) { console.warn(`completeTask called on invalid or done task at index ${index}`); return; }
+        // --- 実行中タスクの編集関連 ---
 
-                if (task.status === Status.DOING) startStopTask(index); // 実行中なら停止
+        /** 実行中タスクを編集モードにする */
+        function editRunningTask(index) {
+          const taskIndex = parseInt(index, 10);
+          if (
+            isNaN(taskIndex) ||
+            taskIndex < 0 ||
+            taskIndex >= tasks.length ||
+            !tasks[taskIndex]
+          ) {
+            console.error("Invalid index or task for editRunningTask:", index);
+            return;
+          }
 
-                completedTaskName.textContent = task.name;
-                plannedTime.textContent = formatTime(task.estimatedTime);
-                actualTime.textContent = formatTime(task.actualTime || 0);
-                reflectionMemo.value = task.reflectionMemo || '';
-                saveMemoButton.dataset.index = index;
-                reflectionModal.style.display = 'block';
-                reflectionMemo.focus();
-            }
+          const listItem = taskList.querySelector(
+            `li[data-index="${taskIndex}"]`
+          );
+          if (!listItem) return;
 
-            /** 反省メモを保存しタスクを完了状態にする */
-            function saveReflectionAndComplete() {
-                const index = parseInt(saveMemoButton.dataset.index, 10);
-                if (isNaN(index) || !tasks[index]) { console.error("Invalid index for saveReflectionAndComplete:", index); closeModal(); return; }
+          const currentlyEditing = taskList.querySelector("li.editing");
+          if (currentlyEditing && currentlyEditing !== listItem) {
+            const editingIndex = parseInt(currentlyEditing.dataset.index, 10);
+            if (!isNaN(editingIndex)) cancelRunningTaskEdit(editingIndex);
+          }
 
-                const task = tasks[index];
-                task.reflectionMemo = reflectionMemo.value.trim();
-                task.status = Status.DONE;
-                if (task.intervalId) { clearInterval(task.intervalId); task.intervalId = null; }
+          const task = tasks[taskIndex];
+          const taskNameEscaped = escapeHTML(task.name);
+          const descriptionEscaped = escapeHTML(task.description || "");
+          const estimatedTimeValue =
+            task.estimatedTime != null ? task.estimatedTime : "";
+          const dueDateValue = task.dueDate || "";
 
-                saveTasks();
-                updateRunningTaskList();
-                updateCompletedTaskList();
-                closeModal();
-            }
-
-            /** タスクを削除 */
-            function deleteTask(index) {
-                 const task = tasks[index];
-                 if (!task) { console.warn(`deleteTask called on invalid task at index ${index}`); return; }
-                 if (task.status === Status.DOING && task.intervalId) {
-                    clearInterval(task.intervalId);
-                    task.intervalId = null;
-                 }
-                 tasks.splice(index, 1);
-                 saveTasks();
-                 updateRunningTaskList();
-            }
-
-            /** モーダルを閉じる */
-            function closeModal() {
-                reflectionModal.style.display = 'none';
-                reflectionMemo.value = '';
-            }
-
-            // --- 実行中タスクの編集関連 ---
-
-            /** 実行中タスクを編集モードにする */
-            function editRunningTask(index) {
-                const taskIndex = parseInt(index, 10);
-                if (isNaN(taskIndex) || taskIndex < 0 || taskIndex >= tasks.length || !tasks[taskIndex]) { console.error("Invalid index or task for editRunningTask:", index); return; }
-
-                const listItem = taskList.querySelector(`li[data-index="${taskIndex}"]`);
-                if (!listItem) return;
-
-                const currentlyEditing = taskList.querySelector('li.editing');
-                if (currentlyEditing && currentlyEditing !== listItem) {
-                    const editingIndex = parseInt(currentlyEditing.dataset.index, 10);
-                    if (!isNaN(editingIndex)) cancelRunningTaskEdit(editingIndex);
-                }
-
-                const task = tasks[taskIndex];
-                const taskNameEscaped = escapeHTML(task.name);
-                const descriptionEscaped = escapeHTML(task.description || '');
-                const estimatedTimeValue = task.estimatedTime != null ? task.estimatedTime : '';
-                const dueDateValue = task.dueDate || '';
-
-                listItem.innerHTML = `
+          listItem.innerHTML = `
                     <div class="edit-form"> <div class="input-group"><label for="taskNameEdit-${taskIndex}">タスク名:</label><input type="text" id="taskNameEdit-${taskIndex}" class="taskNameEdit" value="${taskNameEscaped}"></div>
                         <div class="input-group"><label for="taskDescriptionEdit-${taskIndex}">タスク説明:</label><textarea id="taskDescriptionEdit-${taskIndex}" class="taskDescriptionEdit">${descriptionEscaped}</textarea></div>
                         <div class="input-group"><label for="estimatedTimeEdit-${taskIndex}">予定時間(分):</label><input type="number" id="estimatedTimeEdit-${taskIndex}" class="estimatedTimeEdit" value="${estimatedTimeValue}"></div>
                         <div class="input-group"><label for="taskDueDateEdit-${taskIndex}">期限:</label><input type="date" id="taskDueDateEdit-${taskIndex}" class="taskDueDateEdit" value="${dueDateValue}"></div>
                         <div class="input-group"><label for="taskPriorityEdit-${taskIndex}">優先度:</label><select id="taskPriorityEdit-${taskIndex}" class="taskPriorityEdit">
-                                <option value="high" ${task.priority === Priority.HIGH ? 'selected' : ''}>高</option>
-                                <option value="medium" ${task.priority === Priority.MEDIUM ? 'selected' : ''}>中</option>
-                                <option value="low" ${task.priority === Priority.LOW ? 'selected' : ''}>低</option>
+                                <option value="high" ${
+                                  task.priority === Priority.HIGH
+                                    ? "selected"
+                                    : ""
+                                }>高</option>
+                                <option value="medium" ${
+                                  task.priority === Priority.MEDIUM
+                                    ? "selected"
+                                    : ""
+                                }>中</option>
+                                <option value="low" ${
+                                  task.priority === Priority.LOW
+                                    ? "selected"
+                                    : ""
+                                }>低</option>
                             </select></div>
                         <div class="edit-form-actions">
                             <button class="saveRunningButton" data-index="${taskIndex}">保存</button>
                             <button class="cancelRunningButton" data-index="${taskIndex}">キャンセル</button>
                         </div>
                     </div>`;
-                listItem.classList.add('editing');
-                listItem.querySelector('.taskNameEdit')?.focus();
-            }
+          listItem.classList.add("editing");
+          listItem.querySelector(".taskNameEdit")?.focus();
+        }
 
-            /** 実行中タスクの編集内容を保存 */
-            function saveRunningTask(index) {
-                const taskIndex = parseInt(index, 10);
-                if (isNaN(taskIndex) || taskIndex < 0 || taskIndex >= tasks.length || !tasks[taskIndex]) { console.error("Invalid index or task for saveRunningTask:", index); return; }
+        /** 実行中タスクの編集内容を保存 */
+        function saveRunningTask(index) {
+          const taskIndex = parseInt(index, 10);
+          if (
+            isNaN(taskIndex) ||
+            taskIndex < 0 ||
+            taskIndex >= tasks.length ||
+            !tasks[taskIndex]
+          ) {
+            console.error("Invalid index or task for saveRunningTask:", index);
+            return;
+          }
 
-                const listItem = taskList.querySelector(`li[data-index="${taskIndex}"]`);
-                if (!listItem || !listItem.classList.contains('editing')) return;
+          const listItem = taskList.querySelector(
+            `li[data-index="${taskIndex}"]`
+          );
+          if (!listItem || !listItem.classList.contains("editing")) return;
 
-                const task = tasks[taskIndex];
-                const newName = listItem.querySelector('.taskNameEdit').value.trim();
-                const newDescription = listItem.querySelector('.taskDescriptionEdit').value.trim();
-                const newEstimatedTime = listItem.querySelector('.estimatedTimeEdit').value;
-                const newDueDate = listItem.querySelector('.taskDueDateEdit').value || null;
-                const newPriority = listItem.querySelector('.taskPriorityEdit').value;
+          const task = tasks[taskIndex];
+          const newName = listItem.querySelector(".taskNameEdit").value.trim();
+          const newDescription = listItem
+            .querySelector(".taskDescriptionEdit")
+            .value.trim();
+          const newEstimatedTime =
+            listItem.querySelector(".estimatedTimeEdit").value;
+          const newDueDate =
+            listItem.querySelector(".taskDueDateEdit").value || null;
+          const newPriority = listItem.querySelector(".taskPriorityEdit").value;
 
-                if (newName === '') { alert('タスク名は必須です。'); listItem.querySelector('.taskNameEdit')?.focus(); return; }
-                const estTimeNum = parseInt(newEstimatedTime, 10);
-                if (isNaN(estTimeNum) || estTimeNum <= 0) { alert('有効な予定時間（正の分数）を入力してください。'); listItem.querySelector('.estimatedTimeEdit')?.focus(); return; }
+          if (newName === "") {
+            alert("タスク名は必須です。");
+            listItem.querySelector(".taskNameEdit")?.focus();
+            return;
+          }
+          const estTimeNum = parseInt(newEstimatedTime, 10);
+          if (isNaN(estTimeNum) || estTimeNum <= 0) {
+            alert("有効な予定時間（正の分数）を入力してください。");
+            listItem.querySelector(".estimatedTimeEdit")?.focus();
+            return;
+          }
 
-                task.name = newName;
-                task.description = newDescription;
-                task.estimatedTime = estTimeNum;
-                task.dueDate = newDueDate;
-                task.priority = newPriority;
+          task.name = newName;
+          task.description = newDescription;
+          task.estimatedTime = estTimeNum;
+          task.dueDate = newDueDate;
+          task.priority = newPriority;
 
-                saveTasks();
-                renderRunningTaskListItem(listItem, task, taskIndex);
-            }
+          saveTasks();
+          renderRunningTaskListItem(listItem, task, taskIndex);
+        }
 
-             /** 実行中タスクの編集をキャンセル */
-            function cancelRunningTaskEdit(index) {
-                 const taskIndex = parseInt(index, 10);
-                 if (isNaN(taskIndex) || taskIndex < 0 || taskIndex >= tasks.length || !tasks[taskIndex]) { console.error("Invalid index or task for cancelRunningTaskEdit:", index); return; }
-                 const listItem = taskList.querySelector(`li[data-index="${taskIndex}"]`);
-                 if (!listItem || !listItem.classList.contains('editing')) return;
-                 const task = tasks[taskIndex];
-                 renderRunningTaskListItem(listItem, task, taskIndex);
-            }
+        /** 実行中タスクの編集をキャンセル */
+        function cancelRunningTaskEdit(index) {
+          const taskIndex = parseInt(index, 10);
+          if (
+            isNaN(taskIndex) ||
+            taskIndex < 0 ||
+            taskIndex >= tasks.length ||
+            !tasks[taskIndex]
+          ) {
+            console.error(
+              "Invalid index or task for cancelRunningTaskEdit:",
+              index
+            );
+            return;
+          }
+          const listItem = taskList.querySelector(
+            `li[data-index="${taskIndex}"]`
+          );
+          if (!listItem || !listItem.classList.contains("editing")) return;
+          const task = tasks[taskIndex];
+          renderRunningTaskListItem(listItem, task, taskIndex);
+        }
 
+        // --- 完了リストの編集関連 ---
+        /** 完了タスクを編集モードにする */
+        function editCompletedTask(index) {
+          const taskIndex = parseInt(index, 10);
+          if (
+            isNaN(taskIndex) ||
+            taskIndex < 0 ||
+            taskIndex >= tasks.length ||
+            !tasks[taskIndex]
+          ) {
+            console.error(
+              "Invalid index or task for editCompletedTask:",
+              index
+            );
+            return;
+          }
+          const listItem = completedTaskList.querySelector(
+            `li[data-task-index="${taskIndex}"]`
+          );
+          if (!listItem) return;
+          const currentlyEditing =
+            completedTaskList.querySelector("li.editing");
+          if (currentlyEditing && currentlyEditing !== listItem) {
+            const editingIndex = parseInt(
+              currentlyEditing.dataset.taskIndex,
+              10
+            );
+            if (!isNaN(editingIndex)) cancelCompletedTaskEdit(editingIndex);
+          }
 
-            // --- 完了リストの編集関連 ---
-            /** 完了タスクを編集モードにする */
-            function editCompletedTask(index) {
-                const taskIndex = parseInt(index, 10);
-                if (isNaN(taskIndex) || taskIndex < 0 || taskIndex >= tasks.length || !tasks[taskIndex]) { console.error("Invalid index or task for editCompletedTask:", index); return; }
-                const listItem = completedTaskList.querySelector(`li[data-task-index="${taskIndex}"]`);
-                if (!listItem) return;
-                const currentlyEditing = completedTaskList.querySelector('li.editing');
-                if (currentlyEditing && currentlyEditing !== listItem) {
-                    const editingIndex = parseInt(currentlyEditing.dataset.taskIndex, 10);
-                    if (!isNaN(editingIndex)) cancelCompletedTaskEdit(editingIndex);
-                }
+          const task = tasks[taskIndex];
+          const taskNameEscaped = escapeHTML(task.name);
+          const descriptionEscaped = escapeHTML(task.description || "");
+          const estimatedTimeValue =
+            task.estimatedTime != null ? task.estimatedTime : "";
+          const actualTimeValue =
+            task.actualTime != null ? task.actualTime : "";
+          const reflectionMemoEscaped = escapeHTML(task.reflectionMemo || "");
 
-                const task = tasks[taskIndex];
-                const taskNameEscaped = escapeHTML(task.name);
-                const descriptionEscaped = escapeHTML(task.description || '');
-                const estimatedTimeValue = task.estimatedTime != null ? task.estimatedTime : '';
-                const actualTimeValue = task.actualTime != null ? task.actualTime : '';
-                const reflectionMemoEscaped = escapeHTML(task.reflectionMemo || '');
-
-                listItem.innerHTML = `
+          listItem.innerHTML = `
                     <div class="edit-form"> <div class="input-group"><label for="taskName-${taskIndex}">タスク名:</label><input type="text" id="taskName-${taskIndex}" class="taskNameEdit" value="${taskNameEscaped}"></div>
                         <div class="input-group"><label for="taskDescription-${taskIndex}">タスク説明:</label><textarea id="taskDescription-${taskIndex}" class="taskDescriptionEdit">${descriptionEscaped}</textarea></div>
                         <div class="time-inputs">
@@ -659,143 +1261,224 @@
                             <button class="saveButton" data-index="${taskIndex}">保存</button>
                             <button class="cancelCompletedButton" data-index="${taskIndex}">キャンセル</button> </div>
                     </div>`;
-                listItem.classList.add('editing');
-                listItem.querySelector('.taskNameEdit')?.focus();
-            }
+          listItem.classList.add("editing");
+          listItem.querySelector(".taskNameEdit")?.focus();
+        }
 
-            /** 完了タスクの編集内容を保存 */
-            function saveCompletedTask(index) {
-                const taskIndex = parseInt(index, 10);
-                 if (isNaN(taskIndex) || taskIndex < 0 || taskIndex >= tasks.length || !tasks[taskIndex]) { console.error("Invalid index or task for saveCompletedTask:", index); return; }
-                const listItem = completedTaskList.querySelector(`li[data-task-index="${taskIndex}"]`);
-                if (!listItem || !listItem.classList.contains('editing')) return;
+        /** 完了タスクの編集内容を保存 */
+        function saveCompletedTask(index) {
+          const taskIndex = parseInt(index, 10);
+          if (
+            isNaN(taskIndex) ||
+            taskIndex < 0 ||
+            taskIndex >= tasks.length ||
+            !tasks[taskIndex]
+          ) {
+            console.error(
+              "Invalid index or task for saveCompletedTask:",
+              index
+            );
+            return;
+          }
+          const listItem = completedTaskList.querySelector(
+            `li[data-task-index="${taskIndex}"]`
+          );
+          if (!listItem || !listItem.classList.contains("editing")) return;
 
-                const task = tasks[taskIndex];
-                const newName = listItem.querySelector('.taskNameEdit').value.trim();
-                const newDescription = listItem.querySelector('.taskDescriptionEdit').value.trim();
-                const newEstimatedTime = listItem.querySelector('.estimatedTimeEdit').value;
-                const newActualTime = listItem.querySelector('.actualTimeEdit').value;
-                const newReflectionMemo = listItem.querySelector('.reflectionMemoEdit').value.trim();
+          const task = tasks[taskIndex];
+          const newName = listItem.querySelector(".taskNameEdit").value.trim();
+          const newDescription = listItem
+            .querySelector(".taskDescriptionEdit")
+            .value.trim();
+          const newEstimatedTime =
+            listItem.querySelector(".estimatedTimeEdit").value;
+          const newActualTime = listItem.querySelector(".actualTimeEdit").value;
+          const newReflectionMemo = listItem
+            .querySelector(".reflectionMemoEdit")
+            .value.trim();
 
-                task.name = newName || '(名称未設定)';
-                task.description = newDescription;
-                task.estimatedTime = newEstimatedTime === '' ? null : parseFloat(newEstimatedTime);
-                task.actualTime = newActualTime === '' ? null : parseFloat(newActualTime);
-                task.reflectionMemo = newReflectionMemo;
+          task.name = newName || "(名称未設定)";
+          task.description = newDescription;
+          task.estimatedTime =
+            newEstimatedTime === "" ? null : parseFloat(newEstimatedTime);
+          task.actualTime =
+            newActualTime === "" ? null : parseFloat(newActualTime);
+          task.reflectionMemo = newReflectionMemo;
 
-                saveTasks();
-                renderCompletedTaskListItem(listItem, task, taskIndex);
-            }
+          saveTasks();
+          renderCompletedTaskListItem(listItem, task, taskIndex);
+        }
 
-            /** 完了タスクの編集をキャンセルする関数 */
-            function cancelCompletedTaskEdit(index) {
-                const taskIndex = parseInt(index, 10);
-                 if (isNaN(taskIndex) || taskIndex < 0 || taskIndex >= tasks.length || !tasks[taskIndex]) { console.error("Invalid index or task for cancelCompletedTaskEdit:", index); return; }
-                 const listItem = completedTaskList.querySelector(`li[data-task-index="${taskIndex}"]`);
-                 if (!listItem || !listItem.classList.contains('editing')) return;
-                 const task = tasks[taskIndex];
-                 renderCompletedTaskListItem(listItem, task, taskIndex);
-            }
+        /** 完了タスクの編集をキャンセルする関数 */
+        function cancelCompletedTaskEdit(index) {
+          const taskIndex = parseInt(index, 10);
+          if (
+            isNaN(taskIndex) ||
+            taskIndex < 0 ||
+            taskIndex >= tasks.length ||
+            !tasks[taskIndex]
+          ) {
+            console.error(
+              "Invalid index or task for cancelCompletedTaskEdit:",
+              index
+            );
+            return;
+          }
+          const listItem = completedTaskList.querySelector(
+            `li[data-task-index="${taskIndex}"]`
+          );
+          if (!listItem || !listItem.classList.contains("editing")) return;
+          const task = tasks[taskIndex];
+          renderCompletedTaskListItem(listItem, task, taskIndex);
+        }
 
+        // --- タブ切り替え ---
+        function switchTab(targetButton) {
+          if (!targetButton) return;
+          const targetPaneId = targetButton.dataset.tabTarget;
+          const targetPane = document.querySelector(targetPaneId);
+          const allTabButtons = tabNavigation.querySelectorAll(".tab-button");
 
-            // --- タブ切り替え ---
-            function switchTab(targetButton) {
-                if (!targetButton) return;
-                const targetPaneId = targetButton.dataset.tabTarget;
-                const targetPane = document.querySelector(targetPaneId);
-                const allTabButtons = tabNavigation.querySelectorAll('.tab-button');
+          allTabButtons.forEach((btn) => btn.classList.remove("active"));
+          tabPanes.forEach((pane) => pane.classList.remove("active"));
 
-                allTabButtons.forEach(btn => btn.classList.remove('active'));
-                tabPanes.forEach(pane => pane.classList.remove('active'));
+          targetButton.classList.add("active");
+          if (targetPane) {
+            targetPane.classList.add("active");
+          } else {
+            console.error(`Target pane not found: ${targetPaneId}`);
+          }
 
-                targetButton.classList.add('active');
-                if (targetPane) {
-                    targetPane.classList.add('active');
-                } else {
-                    console.error(`Target pane not found: ${targetPaneId}`);
-                }
+          inputArea.style.display =
+            targetPaneId === "#runningTasks" ? "grid" : "none";
 
-                inputArea.style.display = (targetPaneId === '#runningTasks') ? 'grid' : 'none';
+          if (targetPaneId === "#runningTasks") startRunningTaskUpdateTimer();
+          else stopRunningTaskUpdateTimer();
+        }
 
-                if (targetPaneId === '#runningTasks') startRunningTaskUpdateTimer();
-                else stopRunningTaskUpdateTimer();
-            }
-
-            tabNavigation.addEventListener('click', (event) => {
-                const targetButton = event.target.closest('.tab-button');
-                if (targetButton) {
-                    switchTab(targetButton);
-                }
-            });
-
-
-            // --- 定期的な表示更新タイマー ---
-            function startRunningTaskUpdateTimer() {
-                if (runningTaskUpdateTimer) return;
-                runningTaskUpdateTimer = setInterval(() => {
-                    const hasRunningTask = tasks.some(task => task && task.status === Status.DOING);
-                    if (hasRunningTask) updateRunningTaskList();
-                }, UPDATE_INTERVAL_MS);
-            }
-            function stopRunningTaskUpdateTimer() {
-                if (runningTaskUpdateTimer) { clearInterval(runningTaskUpdateTimer); runningTaskUpdateTimer = null; }
-            }
-
-            // --- イベントリスナー設定 ---
-            addTaskButton.addEventListener('click', addTask);
-            taskNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') taskDescriptionInput.focus(); });
-
-            // 実行中タスクリストのクリックイベント
-            taskList.addEventListener('click', (event) => {
-                const button = event.target.closest('button');
-                if (!button) return;
-                const listItem = button.closest('li');
-                if (!listItem) return;
-                const index = parseInt(button.dataset.index ?? listItem.dataset.index, 10);
-                if (isNaN(index) || index < 0 || index >= tasks.length || !tasks[index]) { console.error("Invalid index or task not found in taskList listener:", index); updateRunningTaskList(); return; }
-
-                if (button.classList.contains('startStop')) startStopTask(index);
-                else if (button.classList.contains('complete')) completeTask(index);
-                else if (button.classList.contains('delete')) {
-                    if (confirm(`タスク「${escapeHTML(tasks[index].name)}」を削除しますか？`)) deleteTask(index);
-                }
-                else if (button.classList.contains('editRunningButton')) editRunningTask(index);
-                else if (button.classList.contains('saveRunningButton')) saveRunningTask(index);
-                else if (button.classList.contains('cancelRunningButton')) cancelRunningTaskEdit(index);
-            });
-
-             // 完了タスクリストのクリックイベント
-            completedTaskList.addEventListener('click', (event) => {
-                const button = event.target.closest('button');
-                if (!button) return;
-                const listItem = button.closest('li');
-                if (!listItem) return;
-                const index = parseInt(listItem.dataset.taskIndex, 10);
-                if (isNaN(index) || index < 0 || index >= tasks.length || !tasks[index]) { console.error("Invalid index or task not found in completedTaskList listener:", index); updateCompletedTaskList(); return; }
-
-                if (button.classList.contains('editButton')) editCompletedTask(index);
-                else if (button.classList.contains('saveButton')) saveCompletedTask(index);
-                else if (button.classList.contains('cancelCompletedButton')) cancelCompletedTaskEdit(index);
-            });
-
-            // モーダル関連
-            closeModalButton.addEventListener('click', closeModal);
-            window.addEventListener('click', (event) => { if (event.target === reflectionModal) closeModal(); });
-            saveMemoButton.addEventListener('click', saveReflectionAndComplete);
-            reflectionMemo.addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) saveReflectionAndComplete(); });
-
-            // --- 初期化処理 ---
-            updateAllLists();
-            taskNameInput.focus();
-            const initialActiveTab = document.querySelector('.tab-button.active');
-            if (initialActiveTab) {
-                switchTab(initialActiveTab);
-            } else {
-                const defaultTab = document.querySelector('.tab-button[data-tab-target="#runningTasks"]');
-                if(defaultTab) switchTab(defaultTab);
-            }
-
+        tabNavigation.addEventListener("click", (event) => {
+          const targetButton = event.target.closest(".tab-button");
+          if (targetButton) {
+            switchTab(targetButton);
+          }
         });
+
+        // --- 定期的な表示更新タイマー ---
+        function startRunningTaskUpdateTimer() {
+          if (runningTaskUpdateTimer) return;
+          runningTaskUpdateTimer = setInterval(() => {
+            const hasRunningTask = tasks.some(
+              (task) => task && task.status === Status.DOING
+            );
+            if (hasRunningTask) updateRunningTaskList();
+          }, UPDATE_INTERVAL_MS);
+        }
+        function stopRunningTaskUpdateTimer() {
+          if (runningTaskUpdateTimer) {
+            clearInterval(runningTaskUpdateTimer);
+            runningTaskUpdateTimer = null;
+          }
+        }
+
+        // --- イベントリスナー設定 ---
+        addTaskButton.addEventListener("click", addTask);
+        taskNameInput.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") taskDescriptionInput.focus();
+        });
+
+        // 実行中タスクリストのクリックイベント
+        taskList.addEventListener("click", (event) => {
+          const button = event.target.closest("button");
+          if (!button) return;
+          const listItem = button.closest("li");
+          if (!listItem) return;
+          const index = parseInt(
+            button.dataset.index ?? listItem.dataset.index,
+            10
+          );
+          if (
+            isNaN(index) ||
+            index < 0 ||
+            index >= tasks.length ||
+            !tasks[index]
+          ) {
+            console.error(
+              "Invalid index or task not found in taskList listener:",
+              index
+            );
+            updateRunningTaskList();
+            return;
+          }
+
+          if (button.classList.contains("startStop")) startStopTask(index);
+          else if (button.classList.contains("complete")) completeTask(index);
+          else if (button.classList.contains("delete")) {
+            if (
+              confirm(
+                `タスク「${escapeHTML(tasks[index].name)}」を削除しますか？`
+              )
+            )
+              deleteTask(index);
+          } else if (button.classList.contains("editRunningButton"))
+            editRunningTask(index);
+          else if (button.classList.contains("saveRunningButton"))
+            saveRunningTask(index);
+          else if (button.classList.contains("cancelRunningButton"))
+            cancelRunningTaskEdit(index);
+        });
+
+        // 完了タスクリストのクリックイベント
+        completedTaskList.addEventListener("click", (event) => {
+          const button = event.target.closest("button");
+          if (!button) return;
+          const listItem = button.closest("li");
+          if (!listItem) return;
+          const index = parseInt(listItem.dataset.taskIndex, 10);
+          if (
+            isNaN(index) ||
+            index < 0 ||
+            index >= tasks.length ||
+            !tasks[index]
+          ) {
+            console.error(
+              "Invalid index or task not found in completedTaskList listener:",
+              index
+            );
+            updateCompletedTaskList();
+            return;
+          }
+
+          if (button.classList.contains("editButton")) editCompletedTask(index);
+          else if (button.classList.contains("saveButton"))
+            saveCompletedTask(index);
+          else if (button.classList.contains("cancelCompletedButton"))
+            cancelCompletedTaskEdit(index);
+        });
+
+        // モーダル関連
+        closeModalButton.addEventListener("click", closeModal);
+        window.addEventListener("click", (event) => {
+          if (event.target === reflectionModal) closeModal();
+        });
+        saveMemoButton.addEventListener("click", saveReflectionAndComplete);
+        reflectionMemo.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && (e.ctrlKey || e.metaKey))
+            saveReflectionAndComplete();
+        });
+
+        // --- 初期化処理 ---
+        updateAllLists();
+        taskNameInput.focus();
+        const initialActiveTab = document.querySelector(".tab-button.active");
+        if (initialActiveTab) {
+          switchTab(initialActiveTab);
+        } else {
+          const defaultTab = document.querySelector(
+            '.tab-button[data-tab-target="#runningTasks"]'
+          );
+          if (defaultTab) switchTab(defaultTab);
+        }
+      });
     </script>
-</body>
+  </body>
 </html>

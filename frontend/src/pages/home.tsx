@@ -30,27 +30,27 @@ const sampleTodos: Todo[] = [
 
 const Home: React.FC = () => {
   return (
-    <main className="bg-gray-200">
+    <main className="bg-gray-200 min-h-screen">
       <div className="bg-gray-800 p-4 shadow-md">
         <h1 className="text-white text-2xl fond-bold text-center">
           予実 Tracker
         </h1>
       </div>
 
-      <Tabs>
+      <Tabs className="p-4 max-w-5xl mx-auto">
         <TabList>
-          <Tab>Title 1</Tab>
-          <Tab>Title 2</Tab>
+          <Tab>実行中タスク</Tab>
+          <Tab>完了タスク</Tab>
         </TabList>
 
-        <TabPanel className="p-4">
-          <div className="min-h-screen space-y-4">
+        <TabPanel>
+          <div className="space-y-4 mt-4">
             <TodoForm />
             <TodoList todos={sampleTodos} />
           </div>
         </TabPanel>
         <TabPanel>
-          <h2>Any content 2</h2>
+          <h2>コンテンツ未実装</h2>
         </TabPanel>
       </Tabs>
     </main>

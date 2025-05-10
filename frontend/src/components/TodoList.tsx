@@ -7,7 +7,7 @@ interface Props {
 
 const TodoList: React.FC<Props> = ({ todos }) => {
   if (todos.length === 0) {
-    return <p className="text-center text-gray-500">タスクはありません。</p>;
+    return <p className="text-center">タスクはありません。</p>;
   }
 
   return (
