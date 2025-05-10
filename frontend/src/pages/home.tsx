@@ -2,6 +2,8 @@ import React from "react";
 import TodoList from "../components/TodoList";
 import { Todo } from "../types/todo";
 import TodoForm from "../components/TodoForm";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
 
 const sampleTodos: Todo[] = [
   {
@@ -28,16 +30,29 @@ const sampleTodos: Todo[] = [
 
 const Home: React.FC = () => {
   return (
-    <main>
+    <main className="bg-gray-200">
       <div className="bg-gray-800 p-4 shadow-md">
         <h1 className="text-white text-2xl fond-bold text-center">
           予実 Tracker
         </h1>
       </div>
-      <div className="min-h-screen bg-gray-100 p-4 space-y-4">
-        <TodoForm />
-        <TodoList todos={sampleTodos} />
-      </div>
+
+      <Tabs>
+        <TabList>
+          <Tab>Title 1</Tab>
+          <Tab>Title 2</Tab>
+        </TabList>
+
+        <TabPanel className="p-4">
+          <div className="min-h-screen space-y-4">
+            <TodoForm />
+            <TodoList todos={sampleTodos} />
+          </div>
+        </TabPanel>
+        <TabPanel>
+          <h2>Any content 2</h2>
+        </TabPanel>
+      </Tabs>
     </main>
   );
 };
