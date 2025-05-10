@@ -14,6 +14,8 @@ const TodoForm: React.FC = () => {
 
   const submittedTodo = (todo: Todo) => {
     console.log("新しいTodo: ", todo);
+    // TODO: ここでAPIにPOSTリクエストを送信する処理を追加
+    // 例: axios.post("/api/todos", todo);
   };
 
   const handleChange = (
