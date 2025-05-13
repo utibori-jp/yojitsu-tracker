@@ -65,28 +65,39 @@ const TodoForm: React.FC = () => {
         className="bg-white p-6 rounded-xl shadow-md space-y-4"
       >
         <h2 className="text-2xl font-bold">Todo 作成フォーム</h2>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            タイトル
+          </label>
+          <input
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="例：資料作成"
+            className="w-full border border-gray-300 p-2 rounded-md"
+            required
+          />
+        </div>
 
-        <input
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="タイトル"
-          className="w-full border border-gray-300 p-2 rounded-md"
-          required
-        />
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            詳細
+          </label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="タスクの詳細な内容..."
+            className="w-full border border-gray-300 p-2 rounded-md"
+            rows={3}
+          />
+        </div>
 
-        <textarea
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="詳細"
-          className="w-full border border-gray-300 p-2 rounded-md"
-          rows={3}
-        />
-
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <label className="block text-sm font-medium">予定時間 (分)</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="flex flex-col">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              予定時間 (分)
+            </label>
             <input
               type="number"
               name="estimatedTime"
@@ -96,8 +107,10 @@ const TodoForm: React.FC = () => {
               min={0}
             />
           </div>
-          <div className="flex-1">
-            <label className="block text-sm font-medium">期限</label>
+          <div className="flex flex-col">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              期限
+            </label>
             <input
               type="date"
               name="dueDate"
@@ -111,7 +124,9 @@ const TodoForm: React.FC = () => {
             />
           </div>
           <div className="flex-1">
-            <label className="block text-sm font-medium">優先度</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              優先度
+            </label>
             <select
               name="priority"
               onChange={handleChange}
