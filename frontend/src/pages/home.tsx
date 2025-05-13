@@ -32,7 +32,7 @@ const Home: React.FC = () => {
   return (
     <main className="bg-gray-200 min-h-screen">
       <div className="bg-gray-800 p-4 shadow-md">
-        <h1 className="text-white text-2xl fond-bold text-center">
+        <h1 className="text-white text-2xl font-bold text-center">
           予実 Tracker
         </h1>
       </div>

@@ -59,11 +59,8 @@ const TodoForm: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-xl shadow-md space-y-4"
-      >
+    <div className="mx-auto border border-gray-300 bg-white p-6 rounded-xl shadow-md space-y-4">
+      <form onSubmit={handleSubmit}>
         <h2 className="text-2xl font-bold">Todo 作成フォーム</h2>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
