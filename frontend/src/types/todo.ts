@@ -1,3 +1,4 @@
+// TODO: OpenAPI specから生成した型にすり替える。
 export interface Todo {
   id?: number;
   name: string;
