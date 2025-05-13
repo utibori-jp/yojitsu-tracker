@@ -22,21 +22,26 @@ components:
       properties:
         name:
           type: string
+          minLength: 1
+          maxLength: 255
           description: Name of the task.
           example: "Finalize project report"
         description:
           type: string
           description: Detailed description of the task (optional).
           nullable: true
+          maxLength: 1000
           example: "Compile all sections, review grammar, and add a conclusion."
         estimatedTime:
           type: integer
           format: int32
+          minimum: 1
           description: Estimated time to complete the task in minutes.
           example: 120
         dueDate:
           type: string
           format: date
+          pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
           description: Due date for the task (YYYY-MM-DD, optional).
           nullable: true
           example: "2025-05-20"
@@ -50,35 +55,46 @@ components:
 
     Todo:
       type: object
+      required:
+        - id
+        - name
+        - estimatedTime
+        - priority
+        - status
       properties:
         id:
-          type: number
+          type: integer
           description: Unique identifier for the TODO item.
           readOnly: true
           example: 200
         name:
           type: string
+          minLength: 1
+          maxLength: 255
           description: Name of the task.
           example: "Finalize project report"
         description:
           type: string
           description: Detailed description of the task.
           nullable: true
+          maxLength: 1000
           example: "Compile all sections, review grammar, and add a conclusion."
         estimatedTime:
           type: integer
           format: int32
+          minimum: 1
           description: Estimated time to complete the task in minutes.
           example: 120
         actualTime:
-          type: number
-          format: float
+          type: integer
+          format: int32
+          minimum: 0
           description: Actual time spent on the task in minutes.
-          readOnly: true
-          example: 75.5
+          example: 75
         dueDate:
           type: string
           format: date
+          pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
           description: Due date for the task (YYYY-MM-DD).
           nullable: true
           example: "2025-05-20"
@@ -91,25 +107,25 @@ components:
           type: string
           description: Current status of the task.
           enum: [todo, doing, pending, done]
-          readOnly: true
           example: "doing"
         reflectionMemo:
           type: string
           description: Reflection memo added upon task completion.
+          maxLength: 2000
           nullable: true
           example: "Took longer than expected due to research."
 
     Error:
       type: object
+      required:
+        - code
+        - message
       properties:
         code:
           type: integer
           format: int32
         message:
           type: string
-      required:
-        - code
-        - message
 
 paths:
   /todos:
