@@ -1,0 +1,184 @@
+openapi: 3.0.0
+info:
+  title: TODO Application API
+  version: v1.0.0
+  description: |-
+    API for managing TODO tasks, based on the features of the provided HTML/JavaScript application.
+    This application allows users to create, track, and manage tasks with details like
+    description, estimated time, due date, priority, and status.
+    It also includes features for time tracking and reflection memos upon task completion.
+
+servers:
+  - url: http://localhost:8080/api
+    description: Local development server
+
+components:
+  schemas:
+    TodoCreationRequest:
+      type: object
+      required:
+        - name
+        - estimatedTime
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Name of the task.
+          example: "Finalize project report"
+        description:
+          type: string
+          description: Detailed description of the task (optional).
+          nullable: true
+          maxLength: 1000
+          example: "Compile all sections, review grammar, and add a conclusion."
+        estimatedTime:
+          type: integer
+          format: int32
+          minimum: 1
+          description: Estimated time to complete the task in minutes.
+          example: 120
+        dueDate:
+          type: string
+          format: date
+          pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
+          description: Due date for the task (YYYY-MM-DD, optional).
+          nullable: true
+          example: "2025-05-20"
+        priority:
+          type: string
+          description: Priority of the task (optional, defaults to 'medium' on server).
+          enum: [high, medium, low]
+          default: medium
+          example: "high"
+          nullable: true
+
+    Todo:
+      type: object
+      required:
+        - id
+        - name
+        - estimatedTime
+        - priority
+        - status
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the TODO item.
+          readOnly: true
+          example: 200
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Name of the task.
+          example: "Finalize project report"
+        description:
+          type: string
+          description: Detailed description of the task.
+          nullable: true
+          maxLength: 1000
+          example: "Compile all sections, review grammar, and add a conclusion."
+        estimatedTime:
+          type: integer
+          format: int32
+          minimum: 1
+          description: Estimated time to complete the task in minutes.
+          example: 120
+        actualTime:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Actual time spent on the task in minutes.
+          example: 75
+        dueDate:
+          type: string
+          format: date
+          pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
+          description: Due date for the task (YYYY-MM-DD).
+          nullable: true
+          example: "2025-05-20"
+        priority:
+          type: string
+          description: Priority of the task.
+          enum: [high, medium, low]
+          example: "high"
+        status:
+          type: string
+          description: Current status of the task.
+          enum: [todo, doing, pending, done]
+          example: "doing"
+        reflectionMemo:
+          type: string
+          description: Reflection memo added upon task completion.
+          maxLength: 2000
+          nullable: true
+          example: "Took longer than expected due to research."
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+
+paths:
+  /todos:
+    get:
+      summary: List all TODOs
+      description: Retrieves a list of all TODO items.
+      operationId: listTodos
+      tags:
+        - Todos
+      responses:
+        '200':
+          description: A list of TODOs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create a new TODO
+      description: Adds a new TODO item to the list.
+      operationId: createTodo
+      tags:
+        - Todos
+      requestBody:
+        description: TODO item to create.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoCreationRequest'
+      responses:
+        '201':
+          description: TODO item created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '400':
+          description: Invalid input provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
