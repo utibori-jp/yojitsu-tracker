@@ -1,11 +1,4 @@
-// TODO: OpenAPI specから生成した型にすり替える。
-export interface Todo {
-  id?: number;
-  name: string;
-  description?: string;
-  estimatedTime: number;
-  actualTime: number;
-  dueDate?: Date;
-  priority: "low" | "medium" | "high";
-  status: "todo" | "doing" | "pending" | "done";
-}
+import { z } from "zod";
+import { schemas } from "../generated/api";
+
+export type Todo = z.infer<typeof schemas.Todo>;
