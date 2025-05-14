@@ -38,7 +38,7 @@ type Error struct {
 // Todo defines model for Todo.
 type Todo struct {
 	// ActualTime Actual time spent on the task in minutes.
-	ActualTime *float32 `json:"actualTime,omitempty"`
+	ActualTime *int32 `json:"actualTime,omitempty"`
 
 	// Description Detailed description of the task.
 	Description *string `json:"description"`
@@ -47,22 +47,22 @@ type Todo struct {
 	DueDate *openapi_types.Date `json:"dueDate"`
 
 	// EstimatedTime Estimated time to complete the task in minutes.
-	EstimatedTime *int32 `json:"estimatedTime,omitempty"`
+	EstimatedTime int32 `json:"estimatedTime"`
 
 	// Id Unique identifier for the TODO item.
-	Id *float32 `json:"id,omitempty"`
+	Id *int `json:"id,omitempty"`
 
 	// Name Name of the task.
-	Name *string `json:"name,omitempty"`
+	Name string `json:"name"`
 
 	// Priority Priority of the task.
-	Priority *TodoPriority `json:"priority,omitempty"`
+	Priority TodoPriority `json:"priority"`
 
 	// ReflectionMemo Reflection memo added upon task completion.
 	ReflectionMemo *string `json:"reflectionMemo"`
 
 	// Status Current status of the task.
-	Status *TodoStatus `json:"status,omitempty"`
+	Status TodoStatus `json:"status"`
 }
 
 // TodoPriority Priority of the task.
