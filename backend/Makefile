@@ -16,3 +16,9 @@ start-backend:
 	@go mod tidy
 	@go run cmd/api/main.go -a
 	@echo "Finish backend..."
+
+.PHONY: ent-generate
+ent-generate:
+	@echo "Generating schemas with ent"
+	go generate ./ent
+	@echo "Finish generating schemas"
