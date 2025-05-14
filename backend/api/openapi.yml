@@ -207,7 +207,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  # Path for creating a new TODO item, conventionally POST to the collection URI /todos
+    # Path for creating a new TODO item, conventionally POST to the collection URI /todos
     post:
       summary: Create a new TODO
       description: Adds a new TODO item to the list.
