@@ -1,22 +1,18 @@
 import React, { useState } from "react";
-import type { Todo } from "../types/todo";
+import type { TodoCreationRequest } from "../types/todo";
+import { apiClient } from "../utils/apiClient";
+
+const initialFormData: TodoCreationRequest = {
+  name: "",
+  description: "",
+  estimatedTime: 0,
+  dueDate: undefined,
+  priority: "medium",
+};
 
 const TodoForm: React.FC = () => {
-  const [formData, setFormData] = useState<Omit<Todo, "id">>({
-    name: "",
-    description: "",
-    estimatedTime: 0,
-    actualTime: 0,
-    dueDate: undefined,
-    priority: "medium",
-    status: "todo",
-  });
-
-  const submittedTodo = (todo: Todo) => {
-    console.log("新しいTodo: ", todo);
-    // TODO: ここでAPIにPOSTリクエストを送信する処理を追加
-    // 例: axios.post("/api/todos", todo);
-  };
+  const [formData, setFormData] =
+    useState<TodoCreationRequest>(initialFormData);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -25,12 +21,10 @@ const TodoForm: React.FC = () => {
   ) => {
     const { name, value } = e.target;
 
-    const parsers: Record<string, (val: string) => Date | number | undefined> =
-      {
-        dueDate: (val) => (val ? new Date(val) : undefined),
-        estimatedTime: Number,
-        actualTime: Number,
-      };
+    const parsers: Record<string, (val: string) => number | undefined> = {
+      estimatedTime: Number,
+      actualTime: Number,
+    };
 
     const parse = parsers[name] ?? ((val: string) => val);
 
@@ -40,28 +34,22 @@ const TodoForm: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newTodo: Todo = {
-      ...formData,
-    };
-    submittedTodo(newTodo);
-    // フォームを初期化（必要に応じて）
-    setFormData({
-      name: "",
-      description: "",
-      estimatedTime: 0,
-      actualTime: 0,
-      dueDate: undefined,
-      priority: "medium",
-      status: "todo",
-    });
+    try {
+      // API call
+      await apiClient.createTodo(formData);
+    } catch (err) {
+      console.error("Error submitting todo: ", err);
+    }
+    // フォームを初期化
+    setFormData(initialFormData);
   };
 
   return (
     <div className="mx-auto border border-gray-300 bg-white p-6 rounded-xl shadow-md">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <h2 className="text-2xl font-bold">Todo 作成フォーム</h2>
+        <h2 className="text-2xl font-bold">TodoCreationRequest 作成フォーム</h2>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             タイトル
@@ -82,7 +70,7 @@ const TodoForm: React.FC = () => {
           </label>
           <textarea
             name="description"
-            value={formData.description}
+            value={formData.description ?? initialFormData.description ?? ""}
             onChange={handleChange}
             placeholder="タスクの詳細な内容..."
             className="w-full border border-gray-300 p-2 rounded-md"
@@ -112,11 +100,7 @@ const TodoForm: React.FC = () => {
               type="date"
               name="dueDate"
               onChange={handleChange}
-              value={
-                formData.dueDate
-                  ? formData.dueDate.toISOString().substring(0, 10)
-                  : ""
-              }
+              value={formData.dueDate ?? initialFormData.dueDate ?? ""}
               className="w-full border border-gray-300 p-2 rounded-md"
             />
           </div>
@@ -127,7 +111,7 @@ const TodoForm: React.FC = () => {
             <select
               name="priority"
               onChange={handleChange}
-              value={formData.priority}
+              value={formData.priority ?? initialFormData.priority ?? "medium"}
               className="w-full border border-gray-300 p-2 rounded-md"
             >
               <option value="low">低</option>
