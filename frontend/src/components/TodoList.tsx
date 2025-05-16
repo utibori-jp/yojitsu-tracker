@@ -7,6 +7,7 @@ const TodoList: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
 
   useEffect(() => {
+    // TODO: エラーハンドリング
     const fetchTodos = async () => {
       setTodos(await apiClient.listTodos());
     };

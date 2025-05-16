@@ -14,7 +14,7 @@ interface Props {
 
 const TodoItem: React.FC<Props> = ({ todo }) => {
   const [status, setStatus] = useState<Todo["status"]>(todo.status);
-
+  // "TODO: 各ハンドルの実装"
   const onEdit = () => {
     console.log(`${todo.id}: Edit button clicked`);
   };
