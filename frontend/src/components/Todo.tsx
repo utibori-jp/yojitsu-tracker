@@ -27,6 +27,7 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
 
   const handleStartStop = () => {
     console.log(`${todo.id}: Start/Stop button clicked`);
+    // TODO: 時間測定処理とAPIcallの実装
     if (status === "doing") {
       setStatus("pending");
     } else {
