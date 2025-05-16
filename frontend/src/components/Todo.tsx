@@ -35,7 +35,7 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
   };
 
   return (
-    <div className="border border-gray-300 rounded-xl p-4 shadow-md bg-white mb">
+    <div className="border border-gray-300 rounded-xl p-4 shadow-md bg-white mb-2">
       <div className="mb-2 flex justify-between items-center">
         <h2 className="text-xl font-bold">{todo.name}</h2>
         <div className="flex gap-2">
