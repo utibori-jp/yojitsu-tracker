@@ -5,7 +5,7 @@ import { apiClient } from "../utils/apiClient";
 const initialFormData: TodoCreationRequest = {
   name: "",
   description: "",
-  estimatedTime: 0,
+  estimatedTime: 1,
   dueDate: undefined,
   priority: "medium",
 };
