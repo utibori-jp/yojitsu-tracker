@@ -23,7 +23,6 @@ const TodoForm: React.FC = () => {
 
     const parsers: Record<string, (val: string) => number | undefined> = {
       estimatedTime: Number,
-      actualTime: Number,
     };
 
     const parse = parsers[name] ?? ((val: string) => val);
