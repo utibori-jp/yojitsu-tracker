@@ -1,11 +1,18 @@
 import TodoItem from "./Todo";
+import { useState, useEffect } from "react";
 import type { Todo } from "../types/todo";
+import { apiClient } from "../utils/apiClient";
 
-interface Props {
-  todos: Todo[];
-}
+const TodoList: React.FC = () => {
+  const [todos, setTodos] = useState<Todo[]>([]);
 
-const TodoList: React.FC<Props> = ({ todos }) => {
+  useEffect(() => {
+    const fetchTodos = async () => {
+      setTodos(await apiClient.listTodos());
+    };
+    fetchTodos();
+  }, []);
+
   if (todos.length === 0) {
     return <p className="text-center">タスクはありません。</p>;
   }
