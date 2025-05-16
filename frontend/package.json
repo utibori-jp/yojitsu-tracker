@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate:api": "mkdir -p src/generated && openapi-zod-client ../backend/api/openapi.yml -o ./src/generated/api.ts"
+    "generate:api": "mkdir -p src/generated && openapi-zod-client ../backend/api/openapi.yml -o ./src/generated/api.ts",
+    "prism:mock": "prism mock ../backend/api/openapi.yml -p 8080"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@stoplight/prism-cli": "^5.14.2",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
