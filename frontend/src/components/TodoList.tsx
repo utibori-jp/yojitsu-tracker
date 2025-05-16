@@ -8,6 +8,7 @@ const TodoList: React.FC = () => {
 
   useEffect(() => {
     // TODO: エラーハンドリング
+    // TODO: データの読み込み中であることを視覚的に示す。https://github.com/utibori-jp/yojitsu-tracker/pull/5/#discussion_r2093132408
     const fetchTodos = async () => {
       setTodos(await apiClient.listTodos());
     };
