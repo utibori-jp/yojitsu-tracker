@@ -1,5 +1,5 @@
 import { createApiClient } from "../generated/api";
-
+// TODO: ビルドにするときに管理方法再考。
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 if (!baseUrl) {
   console.warn(

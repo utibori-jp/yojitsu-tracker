@@ -38,6 +38,9 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
     }
   };
 
+  // className definition
+  const badgeClass = "border rounded px-1";
+
   return (
     <div className="border border-gray-300 rounded-xl p-4 shadow-md bg-white mb-2">
       <div className="mb-2 flex justify-between items-center">
@@ -82,10 +85,8 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
         </div>
       </div>
       <div className="flex space-x-4 mb-2">
-        <div className="border rounded px-1">
-          {PRIORITY_LABELS[todo.priority]}
-        </div>
-        <div className="border rounded px-1">{STATUS_LABELS[status]}</div>
+        <div className={badgeClass}>{PRIORITY_LABELS[todo.priority]}</div>
+        <div className={badgeClass}>{STATUS_LABELS[status]}</div>
         <div>期限: {todo.dueDate}</div>
       </div>
       <div>
