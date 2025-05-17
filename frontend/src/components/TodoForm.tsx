@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import type { TodoCreationRequest } from "../types/todo";
 import { apiClient } from "../utils/apiClient";
+import { PRIORITY_LABELS, PRIORITY_ORDER } from "../constants/priority";
 
 const initialFormData: TodoCreationRequest = {
   name: "",
@@ -114,15 +115,17 @@ const TodoForm: React.FC = () => {
               value={formData.priority ?? initialFormData.priority ?? "medium"}
               className="w-full border border-gray-300 p-2 rounded-md"
             >
-              <option value="low">低</option>
-              <option value="medium">中</option>
-              <option value="high">高</option>
+              {PRIORITY_ORDER.map((priority) => (
+                <option key={priority} value={priority}>
+                  {PRIORITY_LABELS[priority]}
+                </option>
+              ))}
             </select>
           </div>
         </div>
         <button
           type="submit"
-          className="w-full bg-green-600 text-white font-bold p-2 rounded-md hover:bg-blue-700"
+          className="w-full bg-green-600 text-white font-bold p-2 rounded-md hover:bg-green-700"
         >
           タスク登録
         </button>

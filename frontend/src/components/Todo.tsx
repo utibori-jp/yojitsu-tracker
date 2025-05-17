@@ -8,6 +8,8 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/solid";
 import IconButton from "./IconButton";
+import { PRIORITY_LABELS } from "../constants/priority";
+import { STATUS_LABELS } from "../constants/status";
 
 interface Props {
   todo: Todo;
@@ -80,8 +82,10 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
         </div>
       </div>
       <div className="flex space-x-4 mb-2">
-        <div className="border rounded px-1">{todo.priority.toUpperCase()}</div>
-        <div className="border rounded px-1">{todo.status}</div>
+        <div className="border rounded px-1">
+          {PRIORITY_LABELS[todo.priority]}
+        </div>
+        <div className="border rounded px-1">{STATUS_LABELS[status]}</div>
         <div>期限: {todo.dueDate}</div>
       </div>
       <div>
