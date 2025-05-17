@@ -136,20 +136,20 @@ paths:
       tags:
         - Todos
       responses:
-        '200':
+        "200":
           description: A list of TODOs.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Todo'
-        '500':
+                  $ref: "#/components/schemas/Todo"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     post:
       summary: Create a new TODO
       description: Adds a new TODO item to the list.
@@ -162,23 +162,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TodoCreationRequest'
+              $ref: "#/components/schemas/TodoCreationRequest"
       responses:
-        '201':
+        "201":
           description: TODO item created successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Todo'
-        '400':
+                $ref: "#/components/schemas/Todo"
+        "400":
           description: Invalid input provided.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
