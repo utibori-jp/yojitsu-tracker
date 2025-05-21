@@ -1,9 +1,14 @@
 import React, { useState } from "react";
-import type { TodoCreationRequest } from "../types/todo";
+import type { TodoCreationRequest, Todo } from "../types/todo";
 import { apiClient } from "../utils/apiClient";
 import { PRIORITY_LABELS, PRIORITY_ORDER } from "../constants/priority";
 
-const initialFormData: TodoCreationRequest = {
+interface Props {
+  initialData?: Todo; // 編集時用
+  onSubmitSuccess?: () => void;
+}
+
+const defaultFormData: TodoCreationRequest = {
   name: "",
   description: "",
   estimatedTime: 1,
@@ -11,9 +16,10 @@ const initialFormData: TodoCreationRequest = {
   priority: "medium",
 };
 
-const TodoForm: React.FC = () => {
-  const [formData, setFormData] =
-    useState<TodoCreationRequest>(initialFormData);
+const TodoForm: React.FC<Props> = ({ initialData, onSubmitSuccess }) => {
+  const [formData, setFormData] = useState<TodoCreationRequest>(
+    initialData ?? defaultFormData
+  );
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -38,19 +44,29 @@ const TodoForm: React.FC = () => {
     e.preventDefault();
     try {
       // TODO: エラーハンドリング
-      // API call
-      await apiClient.createTodo(formData);
+      if (initialData) {
+        // 編集モード
+        // await apiClient.updateTodo(initialData.id, formData);
+      } else {
+        // 新規作成
+        await apiClient.createTodo(formData);
+      }
+
+      if (onSubmitSuccess) onSubmitSuccess();
+
+      // フォームを初期化
+      setFormData(defaultFormData);
     } catch (err) {
       console.error("Error submitting todo: ", err);
     }
-    // フォームを初期化
-    setFormData(initialFormData);
   };
 
   return (
     <div className="mx-auto border border-gray-300 bg-white p-6 rounded-xl shadow-md">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <h2 className="text-2xl font-bold">TodoCreationRequest 作成フォーム</h2>
+        {initialData ? null : (
+          <h2 className="text-2xl font-bold">タスク作成</h2>
+        )}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             タイトル
@@ -71,7 +87,7 @@ const TodoForm: React.FC = () => {
           </label>
           <textarea
             name="description"
-            value={formData.description ?? initialFormData.description ?? ""}
+            value={formData.description ?? defaultFormData.description ?? ""}
             onChange={handleChange}
             placeholder="タスクの詳細な内容..."
             className="w-full border border-gray-300 p-2 rounded-md"
@@ -101,7 +117,7 @@ const TodoForm: React.FC = () => {
               type="date"
               name="dueDate"
               onChange={handleChange}
-              value={formData.dueDate ?? initialFormData.dueDate ?? ""}
+              value={formData.dueDate ?? defaultFormData.dueDate ?? ""}
               className="w-full border border-gray-300 p-2 rounded-md"
             />
           </div>
@@ -112,7 +128,7 @@ const TodoForm: React.FC = () => {
             <select
               name="priority"
               onChange={handleChange}
-              value={formData.priority ?? initialFormData.priority ?? "medium"}
+              value={formData.priority ?? defaultFormData.priority ?? "medium"}
               className="w-full border border-gray-300 p-2 rounded-md"
             >
               {PRIORITY_ORDER.map((priority) => (
@@ -123,12 +139,22 @@ const TodoForm: React.FC = () => {
             </select>
           </div>
         </div>
-        <button
-          type="submit"
-          className="w-full bg-green-600 text-white font-bold p-2 rounded-md hover:bg-green-700"
-        >
-          タスク登録
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="submit"
+            className="w-full bg-green-600 text-white font-bold p-2 rounded-md hover:bg-green-700"
+          >
+            {initialData ? "更新する" : "登録する"}
+          </button>
+          {initialData ? (
+            <button
+              onClick={onSubmitSuccess}
+              className="w-full bg-gray-100 text-brack font-bold p-2 rounded-md hover:bg-gray-200 border border-gray-300"
+            >
+              キャンセル
+            </button>
+          ) : null}
+        </div>
       </form>
     </div>
   );

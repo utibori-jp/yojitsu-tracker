@@ -11,12 +11,14 @@ import IconButton from "./IconButton";
 import { PRIORITY_LABELS } from "../constants/priority";
 import { STATUS_LABELS } from "../constants/status";
 import { timeFormat } from "../utils/timeFormat";
+import TodoForm from "./TodoForm";
 
 interface Props {
   todo: Todo;
 }
 
 const TodoItem: React.FC<Props> = ({ todo }) => {
+  const [isEditing, setIsEditing] = useState(false);
   const [status, setStatus] = useState<Todo["status"]>(todo.status);
   const [actualTime, setActualTime] = useState(todo.actualTime ?? 0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -24,7 +26,7 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
   // "TODO: 各ハンドルの実装"
   const onEdit = () => {
     console.log(`${todo.id}: Edit button clicked`);
-    // TODO: API call to edit the todo
+    setIsEditing(true);
   };
   const onCheck = () => {
     console.log(`${todo.id}: Stop button clicked`);
@@ -55,7 +57,17 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
   // className definition
   const badgeClass = "border rounded px-1";
 
-  return (
+  return isEditing ? (
+    <div>
+      <TodoForm
+        initialData={todo}
+        onSubmitSuccess={() => {
+          setIsEditing(false);
+          // TODO: データ更新 or 再フェッチ
+        }}
+      />
+    </div>
+  ) : (
     <div className="border border-gray-300 rounded-xl p-4 shadow-md bg-white mb-2">
       <div className="mb-2 flex justify-between items-center">
         <h2 className="text-xl font-bold">{todo.name}</h2>
