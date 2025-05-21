@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import type { Todo } from "../types/todo";
 import {
   PencilIcon,
@@ -10,6 +10,7 @@ import {
 import IconButton from "./IconButton";
 import { PRIORITY_LABELS } from "../constants/priority";
 import { STATUS_LABELS } from "../constants/status";
+import { timeFormat } from "../utils/timeFormat";
 
 interface Props {
   todo: Todo;
@@ -17,15 +18,21 @@ interface Props {
 
 const TodoItem: React.FC<Props> = ({ todo }) => {
   const [status, setStatus] = useState<Todo["status"]>(todo.status);
+  const [actualTime, setActualTime] = useState(todo.actualTime ?? 0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
   // "TODO: 各ハンドルの実装"
   const onEdit = () => {
     console.log(`${todo.id}: Edit button clicked`);
+    // TODO: API call to edit the todo
   };
   const onCheck = () => {
     console.log(`${todo.id}: Stop button clicked`);
+    // TODO: API call to update status
   };
   const onDelete = () => {
     console.log(`${todo.id}: Delete button clicked`);
+    // TODO: API call to delete the todo
   };
 
   const handleStartStop = () => {
@@ -33,8 +40,15 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
     // TODO: 時間測定処理とAPIcallの実装
     if (status === "doing") {
       setStatus("pending");
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      // TODO: API call to update actualTime
     } else {
       setStatus("doing");
+      intervalRef.current = setInterval(() => {
+        setActualTime((prevTime) => prevTime + 1);
+      }, 1000);
     }
   };
 
@@ -91,7 +105,7 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
       </div>
       <div>
         <div>
-          予定: {todo.estimatedTime} 分 / 実績: {todo.actualTime} 分
+          予定: {todo.estimatedTime} 分 / 実績: {timeFormat(actualTime)}
         </div>
       </div>
     </div>
