@@ -15,31 +15,50 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-chi/chi/v5"
+	"github.com/oapi-codegen/runtime"
 )
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Create a new TODO
+	// (POST /todo)
+	CreateTodo(w http.ResponseWriter, r *http.Request)
+	// Delete a TODO
+	// (DELETE /todo/{todoId})
+	DeleteTodo(w http.ResponseWriter, r *http.Request, todoId int32)
+	// Update an existing TODO
+	// (PUT /todo/{todoId})
+	UpdateTodo(w http.ResponseWriter, r *http.Request, todoId int32)
 	// List all TODOs
 	// (GET /todos)
 	ListTodos(w http.ResponseWriter, r *http.Request)
-	// Create a new TODO
-	// (POST /todos)
-	CreateTodo(w http.ResponseWriter, r *http.Request)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
 
-// List all TODOs
-// (GET /todos)
-func (_ Unimplemented) ListTodos(w http.ResponseWriter, r *http.Request) {
+// Create a new TODO
+// (POST /todo)
+func (_ Unimplemented) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Create a new TODO
-// (POST /todos)
-func (_ Unimplemented) CreateTodo(w http.ResponseWriter, r *http.Request) {
+// Delete a TODO
+// (DELETE /todo/{todoId})
+func (_ Unimplemented) DeleteTodo(w http.ResponseWriter, r *http.Request, todoId int32) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Update an existing TODO
+// (PUT /todo/{todoId})
+func (_ Unimplemented) UpdateTodo(w http.ResponseWriter, r *http.Request, todoId int32) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// List all TODOs
+// (GET /todos)
+func (_ Unimplemented) ListTodos(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -52,11 +71,11 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(http.Handler) http.Handler
 
-// ListTodos operation middleware
-func (siw *ServerInterfaceWrapper) ListTodos(w http.ResponseWriter, r *http.Request) {
+// CreateTodo operation middleware
+func (siw *ServerInterfaceWrapper) CreateTodo(w http.ResponseWriter, r *http.Request) {
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ListTodos(w, r)
+		siw.Handler.CreateTodo(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -66,11 +85,61 @@ func (siw *ServerInterfaceWrapper) ListTodos(w http.ResponseWriter, r *http.Requ
 	handler.ServeHTTP(w, r)
 }
 
-// CreateTodo operation middleware
-func (siw *ServerInterfaceWrapper) CreateTodo(w http.ResponseWriter, r *http.Request) {
+// DeleteTodo operation middleware
+func (siw *ServerInterfaceWrapper) DeleteTodo(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "todoId" -------------
+	var todoId int32
+
+	err = runtime.BindStyledParameterWithOptions("simple", "todoId", chi.URLParam(r, "todoId"), &todoId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "todoId", Err: err})
+		return
+	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.CreateTodo(w, r)
+		siw.Handler.DeleteTodo(w, r, todoId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateTodo operation middleware
+func (siw *ServerInterfaceWrapper) UpdateTodo(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "todoId" -------------
+	var todoId int32
+
+	err = runtime.BindStyledParameterWithOptions("simple", "todoId", chi.URLParam(r, "todoId"), &todoId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "todoId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateTodo(w, r, todoId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListTodos operation middleware
+func (siw *ServerInterfaceWrapper) ListTodos(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListTodos(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -194,10 +263,16 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/todos", wrapper.ListTodos)
+		r.Post(options.BaseURL+"/todo", wrapper.CreateTodo)
 	})
 	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/todos", wrapper.CreateTodo)
+		r.Delete(options.BaseURL+"/todo/{todoId}", wrapper.DeleteTodo)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/todo/{todoId}", wrapper.UpdateTodo)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/todos", wrapper.ListTodos)
 	})
 
 	return r
@@ -206,27 +281,33 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"2qdmcTVZ/R4AAP//IEkFs6UbAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

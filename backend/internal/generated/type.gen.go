@@ -29,6 +29,21 @@ const (
 	TodoCreationRequestPriorityMedium TodoCreationRequestPriority = "medium"
 )
 
+// Defines values for TodoUpdateRequestPriority.
+const (
+	High   TodoUpdateRequestPriority = "high"
+	Low    TodoUpdateRequestPriority = "low"
+	Medium TodoUpdateRequestPriority = "medium"
+)
+
+// Defines values for TodoUpdateRequestStatus.
+const (
+	TodoUpdateRequestStatusDoing   TodoUpdateRequestStatus = "doing"
+	TodoUpdateRequestStatusDone    TodoUpdateRequestStatus = "done"
+	TodoUpdateRequestStatusPending TodoUpdateRequestStatus = "pending"
+	TodoUpdateRequestStatusTodo    TodoUpdateRequestStatus = "todo"
+)
+
 // Error defines model for Error.
 type Error struct {
 	Code    int32  `json:"code"`
@@ -37,8 +52,8 @@ type Error struct {
 
 // Todo defines model for Todo.
 type Todo struct {
-	// ActualTime Actual time spent on the task in minutes.
-	ActualTime *int32 `json:"actualTime,omitempty"`
+	// ActualTimeSec Actual time spent on the task in minutes.
+	ActualTimeSec int32 `json:"actualTimeSec"`
 
 	// Description Detailed description of the task.
 	Description *string `json:"description"`
@@ -46,8 +61,8 @@ type Todo struct {
 	// DueDate Due date for the task (YYYY-MM-DD).
 	DueDate *openapi_types.Date `json:"dueDate"`
 
-	// EstimatedTime Estimated time to complete the task in minutes.
-	EstimatedTime int32 `json:"estimatedTime"`
+	// EstimatedTimeSec Estimated time to complete the task in minutes.
+	EstimatedTimeSec int32 `json:"estimatedTimeSec"`
 
 	// Id Unique identifier for the TODO item.
 	Id *int `json:"id,omitempty"`
@@ -79,8 +94,8 @@ type TodoCreationRequest struct {
 	// DueDate Due date for the task (YYYY-MM-DD, optional).
 	DueDate *openapi_types.Date `json:"dueDate"`
 
-	// EstimatedTime Estimated time to complete the task in minutes.
-	EstimatedTime int32 `json:"estimatedTime"`
+	// EstimatedTimeSec Estimated time to complete the task in minutes.
+	EstimatedTimeSec int32 `json:"estimatedTimeSec"`
 
 	// Name Name of the task.
 	Name string `json:"name"`
@@ -92,5 +107,41 @@ type TodoCreationRequest struct {
 // TodoCreationRequestPriority Priority of the task (optional, defaults to 'medium' on server).
 type TodoCreationRequestPriority string
 
+// TodoUpdateRequest Schema for updating an existing TODO item. At least one field must be provided.
+type TodoUpdateRequest struct {
+	// ActualTimeSec Actual time spent on the task in minutes. Can be set or updated. If omitted, defaults to 0.
+	ActualTimeSec *int32 `json:"actualTimeSec,omitempty"`
+
+	// Description Detailed description of the task.
+	Description *string `json:"description"`
+
+	// DueDate Due date for the task (YYYY-MM-DD).
+	DueDate *openapi_types.Date `json:"dueDate"`
+
+	// EstimatedTimeSec Estimated time to complete the task in minutes. If omitted in an update, defaults to 1.
+	EstimatedTimeSec *int32 `json:"estimatedTimeSec,omitempty"`
+
+	// Name Name of the task.
+	Name *string `json:"name,omitempty"`
+
+	// Priority Priority of the task.
+	Priority *TodoUpdateRequestPriority `json:"priority"`
+
+	// ReflectionMemo Reflection memo added upon task completion.
+	ReflectionMemo *string `json:"reflectionMemo"`
+
+	// Status Current status of the task.
+	Status *TodoUpdateRequestStatus `json:"status,omitempty"`
+}
+
+// TodoUpdateRequestPriority Priority of the task.
+type TodoUpdateRequestPriority string
+
+// TodoUpdateRequestStatus Current status of the task.
+type TodoUpdateRequestStatus string
+
 // CreateTodoJSONRequestBody defines body for CreateTodo for application/json ContentType.
 type CreateTodoJSONRequestBody = TodoCreationRequest
+
+// UpdateTodoJSONRequestBody defines body for UpdateTodo for application/json ContentType.
+type UpdateTodoJSONRequestBody = TodoUpdateRequest

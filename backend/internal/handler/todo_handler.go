@@ -54,7 +54,7 @@ func (h *TodoHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
 			errors.Is(err, services.ErrStatusInvalid) {
 			sendError(w, http.StatusBadRequest, err.Error())
 		} else {
-			log.Printf("Error creating todo: %v", err)
+			log.Printf("CRITICAL: Failed to create todo in service. Underlying error: %+v", err) // Using %+v can sometimes give more detail for wrapped errors.
 			sendError(w, http.StatusInternalServerError, "Failed to create todo")
 		}
 		return
@@ -66,6 +66,54 @@ func (h *TodoHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error encoding created todo response: %v", err)
 		http.Error(w, "Failed to encode created todo response", http.StatusInternalServerError)
 	}
+}
+
+// UpdateTodo handles PUT /todo/{todoId} requests.
+func (h *TodoHandler) UpdateTodo(w http.ResponseWriter, r *http.Request, todoId int32) {
+	var reqBody api.TodoUpdateRequest
+	// Decode request body. oapi-codegen middleware should have validated basic format and minProperties.
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		sendError(w, http.StatusBadRequest, fmt.Sprintf("Invalid request body: %v", err))
+		return
+	}
+	defer r.Body.Close()
+
+	updatedTodo, err := h.todoService.UpdateTodo(r.Context(), todoId, reqBody)
+	if err != nil {
+		if errors.Is(err, services.ErrTodoNotFound) {
+			sendError(w, http.StatusNotFound, err.Error())
+		} else if errors.Is(err, services.ErrValidationFailed) ||
+			errors.Is(err, services.ErrPriorityInvalid) ||
+			errors.Is(err, services.ErrStatusInvalid) {
+			sendError(w, http.StatusBadRequest, err.Error())
+		} else {
+			log.Printf("Error updating todo with ID %d: %v", todoId, err)
+			sendError(w, http.StatusInternalServerError, "Failed to update todo")
+		}
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(updatedTodo); err != nil {
+		log.Printf("Error encoding updated todo response: %v", err)
+		http.Error(w, "Failed to encode updated todo response", http.StatusInternalServerError)
+	}
+}
+
+// DeleteTodo handles DELETE /todo/{todoId} requests.
+func (h *TodoHandler) DeleteTodo(w http.ResponseWriter, r *http.Request, todoId int32) {
+	err := h.todoService.DeleteTodo(r.Context(), todoId)
+	if err != nil {
+		if errors.Is(err, services.ErrTodoNotFound) {
+			sendError(w, http.StatusNotFound, err.Error())
+		} else {
+			log.Printf("Error deleting todo with ID %d: %v", todoId, err)
+			sendError(w, http.StatusInternalServerError, "Failed to delete todo")
+		}
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func sendError(w http.ResponseWriter, code int, message string) {
