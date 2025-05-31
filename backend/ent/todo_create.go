@@ -69,22 +69,30 @@ func (tc *TodoCreate) SetNillableDescription(s *string) *TodoCreate {
 	return tc
 }
 
-// SetEstimatedTime sets the "estimated_time" field.
-func (tc *TodoCreate) SetEstimatedTime(i int32) *TodoCreate {
-	tc.mutation.SetEstimatedTime(i)
+// SetEstimatedTimeSec sets the "estimated_time_sec" field.
+func (tc *TodoCreate) SetEstimatedTimeSec(i int32) *TodoCreate {
+	tc.mutation.SetEstimatedTimeSec(i)
 	return tc
 }
 
-// SetActualTime sets the "actual_time" field.
-func (tc *TodoCreate) SetActualTime(i int32) *TodoCreate {
-	tc.mutation.SetActualTime(i)
-	return tc
-}
-
-// SetNillableActualTime sets the "actual_time" field if the given value is not nil.
-func (tc *TodoCreate) SetNillableActualTime(i *int32) *TodoCreate {
+// SetNillableEstimatedTimeSec sets the "estimated_time_sec" field if the given value is not nil.
+func (tc *TodoCreate) SetNillableEstimatedTimeSec(i *int32) *TodoCreate {
 	if i != nil {
-		tc.SetActualTime(*i)
+		tc.SetEstimatedTimeSec(*i)
+	}
+	return tc
+}
+
+// SetActualTimeSec sets the "actual_time_sec" field.
+func (tc *TodoCreate) SetActualTimeSec(i int32) *TodoCreate {
+	tc.mutation.SetActualTimeSec(i)
+	return tc
+}
+
+// SetNillableActualTimeSec sets the "actual_time_sec" field if the given value is not nil.
+func (tc *TodoCreate) SetNillableActualTimeSec(i *int32) *TodoCreate {
+	if i != nil {
+		tc.SetActualTimeSec(*i)
 	}
 	return tc
 }
@@ -207,6 +215,14 @@ func (tc *TodoCreate) defaults() {
 		v := todo.DefaultUpdatedAt()
 		tc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := tc.mutation.EstimatedTimeSec(); !ok {
+		v := todo.DefaultEstimatedTimeSec
+		tc.mutation.SetEstimatedTimeSec(v)
+	}
+	if _, ok := tc.mutation.ActualTimeSec(); !ok {
+		v := todo.DefaultActualTimeSec
+		tc.mutation.SetActualTimeSec(v)
+	}
 	if _, ok := tc.mutation.Priority(); !ok {
 		v := todo.DefaultPriority
 		tc.mutation.SetPriority(v)
@@ -238,17 +254,20 @@ func (tc *TodoCreate) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Todo.description": %w`, err)}
 		}
 	}
-	if _, ok := tc.mutation.EstimatedTime(); !ok {
-		return &ValidationError{Name: "estimated_time", err: errors.New(`ent: missing required field "Todo.estimated_time"`)}
+	if _, ok := tc.mutation.EstimatedTimeSec(); !ok {
+		return &ValidationError{Name: "estimated_time_sec", err: errors.New(`ent: missing required field "Todo.estimated_time_sec"`)}
 	}
-	if v, ok := tc.mutation.EstimatedTime(); ok {
-		if err := todo.EstimatedTimeValidator(v); err != nil {
-			return &ValidationError{Name: "estimated_time", err: fmt.Errorf(`ent: validator failed for field "Todo.estimated_time": %w`, err)}
+	if v, ok := tc.mutation.EstimatedTimeSec(); ok {
+		if err := todo.EstimatedTimeSecValidator(v); err != nil {
+			return &ValidationError{Name: "estimated_time_sec", err: fmt.Errorf(`ent: validator failed for field "Todo.estimated_time_sec": %w`, err)}
 		}
 	}
-	if v, ok := tc.mutation.ActualTime(); ok {
-		if err := todo.ActualTimeValidator(v); err != nil {
-			return &ValidationError{Name: "actual_time", err: fmt.Errorf(`ent: validator failed for field "Todo.actual_time": %w`, err)}
+	if _, ok := tc.mutation.ActualTimeSec(); !ok {
+		return &ValidationError{Name: "actual_time_sec", err: errors.New(`ent: missing required field "Todo.actual_time_sec"`)}
+	}
+	if v, ok := tc.mutation.ActualTimeSec(); ok {
+		if err := todo.ActualTimeSecValidator(v); err != nil {
+			return &ValidationError{Name: "actual_time_sec", err: fmt.Errorf(`ent: validator failed for field "Todo.actual_time_sec": %w`, err)}
 		}
 	}
 	if _, ok := tc.mutation.Priority(); !ok {
@@ -314,13 +333,13 @@ func (tc *TodoCreate) createSpec() (*Todo, *sqlgraph.CreateSpec) {
 		_spec.SetField(todo.FieldDescription, field.TypeString, value)
 		_node.Description = &value
 	}
-	if value, ok := tc.mutation.EstimatedTime(); ok {
-		_spec.SetField(todo.FieldEstimatedTime, field.TypeInt32, value)
-		_node.EstimatedTime = value
+	if value, ok := tc.mutation.EstimatedTimeSec(); ok {
+		_spec.SetField(todo.FieldEstimatedTimeSec, field.TypeInt32, value)
+		_node.EstimatedTimeSec = value
 	}
-	if value, ok := tc.mutation.ActualTime(); ok {
-		_spec.SetField(todo.FieldActualTime, field.TypeInt32, value)
-		_node.ActualTime = &value
+	if value, ok := tc.mutation.ActualTimeSec(); ok {
+		_spec.SetField(todo.FieldActualTimeSec, field.TypeInt32, value)
+		_node.ActualTimeSec = value
 	}
 	if value, ok := tc.mutation.DueDate(); ok {
 		_spec.SetField(todo.FieldDueDate, field.TypeTime, value)

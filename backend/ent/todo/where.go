@@ -75,14 +75,14 @@ func Description(v string) predicate.Todo {
 	return predicate.Todo(sql.FieldEQ(FieldDescription, v))
 }
 
-// EstimatedTime applies equality check predicate on the "estimated_time" field. It's identical to EstimatedTimeEQ.
-func EstimatedTime(v int32) predicate.Todo {
-	return predicate.Todo(sql.FieldEQ(FieldEstimatedTime, v))
+// EstimatedTimeSec applies equality check predicate on the "estimated_time_sec" field. It's identical to EstimatedTimeSecEQ.
+func EstimatedTimeSec(v int32) predicate.Todo {
+	return predicate.Todo(sql.FieldEQ(FieldEstimatedTimeSec, v))
 }
 
-// ActualTime applies equality check predicate on the "actual_time" field. It's identical to ActualTimeEQ.
-func ActualTime(v int32) predicate.Todo {
-	return predicate.Todo(sql.FieldEQ(FieldActualTime, v))
+// ActualTimeSec applies equality check predicate on the "actual_time_sec" field. It's identical to ActualTimeSecEQ.
+func ActualTimeSec(v int32) predicate.Todo {
+	return predicate.Todo(sql.FieldEQ(FieldActualTimeSec, v))
 }
 
 // DueDate applies equality check predicate on the "due_date" field. It's identical to DueDateEQ.
@@ -315,94 +315,84 @@ func DescriptionContainsFold(v string) predicate.Todo {
 	return predicate.Todo(sql.FieldContainsFold(FieldDescription, v))
 }
 
-// EstimatedTimeEQ applies the EQ predicate on the "estimated_time" field.
-func EstimatedTimeEQ(v int32) predicate.Todo {
-	return predicate.Todo(sql.FieldEQ(FieldEstimatedTime, v))
+// EstimatedTimeSecEQ applies the EQ predicate on the "estimated_time_sec" field.
+func EstimatedTimeSecEQ(v int32) predicate.Todo {
+	return predicate.Todo(sql.FieldEQ(FieldEstimatedTimeSec, v))
 }
 
-// EstimatedTimeNEQ applies the NEQ predicate on the "estimated_time" field.
-func EstimatedTimeNEQ(v int32) predicate.Todo {
-	return predicate.Todo(sql.FieldNEQ(FieldEstimatedTime, v))
+// EstimatedTimeSecNEQ applies the NEQ predicate on the "estimated_time_sec" field.
+func EstimatedTimeSecNEQ(v int32) predicate.Todo {
+	return predicate.Todo(sql.FieldNEQ(FieldEstimatedTimeSec, v))
 }
 
-// EstimatedTimeIn applies the In predicate on the "estimated_time" field.
-func EstimatedTimeIn(vs ...int32) predicate.Todo {
-	return predicate.Todo(sql.FieldIn(FieldEstimatedTime, vs...))
+// EstimatedTimeSecIn applies the In predicate on the "estimated_time_sec" field.
+func EstimatedTimeSecIn(vs ...int32) predicate.Todo {
+	return predicate.Todo(sql.FieldIn(FieldEstimatedTimeSec, vs...))
 }
 
-// EstimatedTimeNotIn applies the NotIn predicate on the "estimated_time" field.
-func EstimatedTimeNotIn(vs ...int32) predicate.Todo {
-	return predicate.Todo(sql.FieldNotIn(FieldEstimatedTime, vs...))
+// EstimatedTimeSecNotIn applies the NotIn predicate on the "estimated_time_sec" field.
+func EstimatedTimeSecNotIn(vs ...int32) predicate.Todo {
+	return predicate.Todo(sql.FieldNotIn(FieldEstimatedTimeSec, vs...))
 }
 
-// EstimatedTimeGT applies the GT predicate on the "estimated_time" field.
-func EstimatedTimeGT(v int32) predicate.Todo {
-	return predicate.Todo(sql.FieldGT(FieldEstimatedTime, v))
+// EstimatedTimeSecGT applies the GT predicate on the "estimated_time_sec" field.
+func EstimatedTimeSecGT(v int32) predicate.Todo {
+	return predicate.Todo(sql.FieldGT(FieldEstimatedTimeSec, v))
 }
 
-// EstimatedTimeGTE applies the GTE predicate on the "estimated_time" field.
-func EstimatedTimeGTE(v int32) predicate.Todo {
-	return predicate.Todo(sql.FieldGTE(FieldEstimatedTime, v))
+// EstimatedTimeSecGTE applies the GTE predicate on the "estimated_time_sec" field.
+func EstimatedTimeSecGTE(v int32) predicate.Todo {
+	return predicate.Todo(sql.FieldGTE(FieldEstimatedTimeSec, v))
 }
 
-// EstimatedTimeLT applies the LT predicate on the "estimated_time" field.
-func EstimatedTimeLT(v int32) predicate.Todo {
-	return predicate.Todo(sql.FieldLT(FieldEstimatedTime, v))
+// EstimatedTimeSecLT applies the LT predicate on the "estimated_time_sec" field.
+func EstimatedTimeSecLT(v int32) predicate.Todo {
+	return predicate.Todo(sql.FieldLT(FieldEstimatedTimeSec, v))
 }
 
-// EstimatedTimeLTE applies the LTE predicate on the "estimated_time" field.
-func EstimatedTimeLTE(v int32) predicate.Todo {
-	return predicate.Todo(sql.FieldLTE(FieldEstimatedTime, v))
+// EstimatedTimeSecLTE applies the LTE predicate on the "estimated_time_sec" field.
+func EstimatedTimeSecLTE(v int32) predicate.Todo {
+	return predicate.Todo(sql.FieldLTE(FieldEstimatedTimeSec, v))
 }
 
-// ActualTimeEQ applies the EQ predicate on the "actual_time" field.
-func ActualTimeEQ(v int32) predicate.Todo {
-	return predicate.Todo(sql.FieldEQ(FieldActualTime, v))
+// ActualTimeSecEQ applies the EQ predicate on the "actual_time_sec" field.
+func ActualTimeSecEQ(v int32) predicate.Todo {
+	return predicate.Todo(sql.FieldEQ(FieldActualTimeSec, v))
 }
 
-// ActualTimeNEQ applies the NEQ predicate on the "actual_time" field.
-func ActualTimeNEQ(v int32) predicate.Todo {
-	return predicate.Todo(sql.FieldNEQ(FieldActualTime, v))
+// ActualTimeSecNEQ applies the NEQ predicate on the "actual_time_sec" field.
+func ActualTimeSecNEQ(v int32) predicate.Todo {
+	return predicate.Todo(sql.FieldNEQ(FieldActualTimeSec, v))
 }
 
-// ActualTimeIn applies the In predicate on the "actual_time" field.
-func ActualTimeIn(vs ...int32) predicate.Todo {
-	return predicate.Todo(sql.FieldIn(FieldActualTime, vs...))
+// ActualTimeSecIn applies the In predicate on the "actual_time_sec" field.
+func ActualTimeSecIn(vs ...int32) predicate.Todo {
+	return predicate.Todo(sql.FieldIn(FieldActualTimeSec, vs...))
 }
 
-// ActualTimeNotIn applies the NotIn predicate on the "actual_time" field.
-func ActualTimeNotIn(vs ...int32) predicate.Todo {
-	return predicate.Todo(sql.FieldNotIn(FieldActualTime, vs...))
+// ActualTimeSecNotIn applies the NotIn predicate on the "actual_time_sec" field.
+func ActualTimeSecNotIn(vs ...int32) predicate.Todo {
+	return predicate.Todo(sql.FieldNotIn(FieldActualTimeSec, vs...))
 }
 
-// ActualTimeGT applies the GT predicate on the "actual_time" field.
-func ActualTimeGT(v int32) predicate.Todo {
-	return predicate.Todo(sql.FieldGT(FieldActualTime, v))
+// ActualTimeSecGT applies the GT predicate on the "actual_time_sec" field.
+func ActualTimeSecGT(v int32) predicate.Todo {
+	return predicate.Todo(sql.FieldGT(FieldActualTimeSec, v))
 }
 
-// ActualTimeGTE applies the GTE predicate on the "actual_time" field.
-func ActualTimeGTE(v int32) predicate.Todo {
-	return predicate.Todo(sql.FieldGTE(FieldActualTime, v))
+// ActualTimeSecGTE applies the GTE predicate on the "actual_time_sec" field.
+func ActualTimeSecGTE(v int32) predicate.Todo {
+	return predicate.Todo(sql.FieldGTE(FieldActualTimeSec, v))
 }
 
-// ActualTimeLT applies the LT predicate on the "actual_time" field.
-func ActualTimeLT(v int32) predicate.Todo {
-	return predicate.Todo(sql.FieldLT(FieldActualTime, v))
+// ActualTimeSecLT applies the LT predicate on the "actual_time_sec" field.
+func ActualTimeSecLT(v int32) predicate.Todo {
+	return predicate.Todo(sql.FieldLT(FieldActualTimeSec, v))
 }
 
-// ActualTimeLTE applies the LTE predicate on the "actual_time" field.
-func ActualTimeLTE(v int32) predicate.Todo {
-	return predicate.Todo(sql.FieldLTE(FieldActualTime, v))
-}
-
-// ActualTimeIsNil applies the IsNil predicate on the "actual_time" field.
-func ActualTimeIsNil() predicate.Todo {
-	return predicate.Todo(sql.FieldIsNull(FieldActualTime))
-}
-
-// ActualTimeNotNil applies the NotNil predicate on the "actual_time" field.
-func ActualTimeNotNil() predicate.Todo {
-	return predicate.Todo(sql.FieldNotNull(FieldActualTime))
+// ActualTimeSecLTE applies the LTE predicate on the "actual_time_sec" field.
+func ActualTimeSecLTE(v int32) predicate.Todo {
+	return predicate.Todo(sql.FieldLTE(FieldActualTimeSec, v))
 }
 
 // DueDateEQ applies the EQ predicate on the "due_date" field.

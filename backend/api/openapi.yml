@@ -18,7 +18,7 @@ components:
       type: object
       required:
         - name
-        - estimatedTime
+        - estimatedTimeSec
       properties:
         name:
           type: string
@@ -32,7 +32,7 @@ components:
           nullable: true
           maxLength: 1000
           example: "Compile all sections, review grammar, and add a conclusion."
-        estimatedTime:
+        estimatedTimeSec:
           type: integer
           format: int32
           minimum: 1
@@ -58,8 +58,9 @@ components:
       required:
         - id
         - name
-        - estimatedTime
+        - estimatedTimeSec
         - priority
+        - actualTimeSec
         - status
       properties:
         id:
@@ -79,13 +80,13 @@ components:
           nullable: true
           maxLength: 1000
           example: "Compile all sections, review grammar, and add a conclusion."
-        estimatedTime:
+        estimatedTimeSec:
           type: integer
           format: int32
           minimum: 1
           description: Estimated time to complete the task in minutes.
           example: 120
-        actualTime:
+        actualTimeSec:
           type: integer
           format: int32
           minimum: 0
@@ -114,6 +115,62 @@ components:
           maxLength: 2000
           nullable: true
           example: "Took longer than expected due to research."
+
+    TodoUpdateRequest:
+      type: object
+      description: Schema for updating an existing TODO item. At least one field must be provided.
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Name of the task.
+          example: "Review project report"
+        description:
+          type: string
+          description: Detailed description of the task.
+          nullable: true
+          maxLength: 1000
+          example: "Review all sections for clarity and accuracy."
+        estimatedTimeSec:
+          type: integer
+          format: int32
+          minimum: 1
+          description: Estimated time to complete the task in seconds. If omitted in an update, the existing value is not changed.
+          example: 90
+        actualTimeSec:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Actual time spent on the task in minutes. Can be set or updated. If omitted, defaults to 0.
+          # nullable: true # Remove nullable
+          example: 75
+          default: 0
+        dueDate:
+          type: string
+          format: date
+          pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
+          description: Due date for the task (YYYY-MM-DD).
+          nullable: true
+          example: "2025-05-22"
+        priority:
+          type: string
+          description: Priority of the task.
+          enum: [high, medium, low]
+          nullable: true
+          example: "medium"
+        status:
+          type: string
+          description: Current status of the task.
+          enum: [todo, doing, pending, done]
+          example: "pending"
+        reflectionMemo:
+          type: string
+          description: Reflection memo added upon task completion.
+          maxLength: 2000
+          nullable: true
+          example: "Further research needed for section 3."
 
     Error:
       type: object
@@ -150,6 +207,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  # Path for creating a new TODO item, conventionally POST to the collection URI /todos
     post:
       summary: Create a new TODO
       description: Adds a new TODO item to the list.
@@ -172,6 +230,71 @@ paths:
                 $ref: "#/components/schemas/Todo"
         "400":
           description: Invalid input provided.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # Path for operations on a specific TODO item
+  /todos/{todoId}: # Changed from /todo/{todoId} to /todos/{todoId} for consistency
+    parameters:
+      - name: todoId
+        in: path
+        required: true
+        description: ID of the TODO item.
+        schema:
+          type: integer
+          format: int32
+          example: 1
+    put:
+      summary: Update an existing TODO
+      description: Updates an existing TODO item by ID.
+      operationId: updateTodo
+      tags:
+        - Todos
+      requestBody:
+        description: TODO item data to update. At least one field must be provided.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TodoUpdateRequest"
+      responses:
+        "200":
+          description: TODO item updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+        "400":
+          description: Invalid input provided.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: TODO item not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete a TODO
+      description: Deletes a TODO item by ID.
+      operationId: deleteTodo
+      tags:
+        - Todos
+      responses:
+        "204":
+          description: TODO item deleted successfully.
+        "404":
+          description: TODO item not found.
           content:
             application/json:
               schema:

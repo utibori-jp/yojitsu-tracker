@@ -23,10 +23,10 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
-	// FieldEstimatedTime holds the string denoting the estimated_time field in the database.
-	FieldEstimatedTime = "estimated_time"
-	// FieldActualTime holds the string denoting the actual_time field in the database.
-	FieldActualTime = "actual_time"
+	// FieldEstimatedTimeSec holds the string denoting the estimated_time_sec field in the database.
+	FieldEstimatedTimeSec = "estimated_time_sec"
+	// FieldActualTimeSec holds the string denoting the actual_time_sec field in the database.
+	FieldActualTimeSec = "actual_time_sec"
 	// FieldDueDate holds the string denoting the due_date field in the database.
 	FieldDueDate = "due_date"
 	// FieldPriority holds the string denoting the priority field in the database.
@@ -55,8 +55,8 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldName,
 	FieldDescription,
-	FieldEstimatedTime,
-	FieldActualTime,
+	FieldEstimatedTimeSec,
+	FieldActualTimeSec,
 	FieldDueDate,
 	FieldPriority,
 	FieldStatus,
@@ -95,10 +95,14 @@ var (
 	NameValidator func(string) error
 	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	DescriptionValidator func(string) error
-	// EstimatedTimeValidator is a validator for the "estimated_time" field. It is called by the builders before save.
-	EstimatedTimeValidator func(int32) error
-	// ActualTimeValidator is a validator for the "actual_time" field. It is called by the builders before save.
-	ActualTimeValidator func(int32) error
+	// DefaultEstimatedTimeSec holds the default value on creation for the "estimated_time_sec" field.
+	DefaultEstimatedTimeSec int32
+	// EstimatedTimeSecValidator is a validator for the "estimated_time_sec" field. It is called by the builders before save.
+	EstimatedTimeSecValidator func(int32) error
+	// DefaultActualTimeSec holds the default value on creation for the "actual_time_sec" field.
+	DefaultActualTimeSec int32
+	// ActualTimeSecValidator is a validator for the "actual_time_sec" field. It is called by the builders before save.
+	ActualTimeSecValidator func(int32) error
 	// ReflectionMemoValidator is a validator for the "reflection_memo" field. It is called by the builders before save.
 	ReflectionMemoValidator func(string) error
 )
@@ -186,14 +190,14 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
-// ByEstimatedTime orders the results by the estimated_time field.
-func ByEstimatedTime(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEstimatedTime, opts...).ToFunc()
+// ByEstimatedTimeSec orders the results by the estimated_time_sec field.
+func ByEstimatedTimeSec(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEstimatedTimeSec, opts...).ToFunc()
 }
 
-// ByActualTime orders the results by the actual_time field.
-func ByActualTime(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldActualTime, opts...).ToFunc()
+// ByActualTimeSec orders the results by the actual_time_sec field.
+func ByActualTimeSec(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldActualTimeSec, opts...).ToFunc()
 }
 
 // ByDueDate orders the results by the due_date field.
