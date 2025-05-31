@@ -17,15 +17,15 @@ type User struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// レコード作成日時
+	// Record creation date and time.
 	CreatedAt time.Time `json:"created_at,omitempty"`
-	// レコード最終更新日時
+	// Record last update date and time.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// ユーザー名
+	// Username
 	Username string `json:"username,omitempty"`
-	// メールアドレス
+	// Email address
 	Email string `json:"email,omitempty"`
-	// ハッシュ化されたパスワード
+	// Hashed password
 	PasswordHash string `json:"-"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
@@ -35,7 +35,7 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// このユーザーが所有するTODOタスクのリスト
+	// List of TODO tasks owned by this user
 	Todos []*Todo `json:"todos,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.

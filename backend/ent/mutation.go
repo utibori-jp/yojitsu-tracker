@@ -32,27 +32,27 @@ const (
 // TodoMutation represents an operation that mutates the Todo nodes in the graph.
 type TodoMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *int
-	created_at        *time.Time
-	updated_at        *time.Time
-	name              *string
-	description       *string
-	estimated_time    *int32
-	addestimated_time *int32
-	actual_time       *int32
-	addactual_time    *int32
-	due_date          *time.Time
-	priority          *todo.Priority
-	status            *todo.Status
-	reflection_memo   *string
-	clearedFields     map[string]struct{}
-	owner             *int
-	clearedowner      bool
-	done              bool
-	oldValue          func(context.Context) (*Todo, error)
-	predicates        []predicate.Todo
+	op                    Op
+	typ                   string
+	id                    *int
+	created_at            *time.Time
+	updated_at            *time.Time
+	name                  *string
+	description           *string
+	estimated_time_sec    *int32
+	addestimated_time_sec *int32
+	actual_time_sec       *int32
+	addactual_time_sec    *int32
+	due_date              *time.Time
+	priority              *todo.Priority
+	status                *todo.Status
+	reflection_memo       *string
+	clearedFields         map[string]struct{}
+	owner                 *int
+	clearedowner          bool
+	done                  bool
+	oldValue              func(context.Context) (*Todo, error)
+	predicates            []predicate.Todo
 }
 
 var _ ent.Mutation = (*TodoMutation)(nil)
@@ -310,130 +310,116 @@ func (m *TodoMutation) ResetDescription() {
 	delete(m.clearedFields, todo.FieldDescription)
 }
 
-// SetEstimatedTime sets the "estimated_time" field.
-func (m *TodoMutation) SetEstimatedTime(i int32) {
-	m.estimated_time = &i
-	m.addestimated_time = nil
+// SetEstimatedTimeSec sets the "estimated_time_sec" field.
+func (m *TodoMutation) SetEstimatedTimeSec(i int32) {
+	m.estimated_time_sec = &i
+	m.addestimated_time_sec = nil
 }
 
-// EstimatedTime returns the value of the "estimated_time" field in the mutation.
-func (m *TodoMutation) EstimatedTime() (r int32, exists bool) {
-	v := m.estimated_time
+// EstimatedTimeSec returns the value of the "estimated_time_sec" field in the mutation.
+func (m *TodoMutation) EstimatedTimeSec() (r int32, exists bool) {
+	v := m.estimated_time_sec
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldEstimatedTime returns the old "estimated_time" field's value of the Todo entity.
+// OldEstimatedTimeSec returns the old "estimated_time_sec" field's value of the Todo entity.
 // If the Todo object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TodoMutation) OldEstimatedTime(ctx context.Context) (v int32, err error) {
+func (m *TodoMutation) OldEstimatedTimeSec(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEstimatedTime is only allowed on UpdateOne operations")
+		return v, errors.New("OldEstimatedTimeSec is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEstimatedTime requires an ID field in the mutation")
+		return v, errors.New("OldEstimatedTimeSec requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEstimatedTime: %w", err)
+		return v, fmt.Errorf("querying old value for OldEstimatedTimeSec: %w", err)
 	}
-	return oldValue.EstimatedTime, nil
+	return oldValue.EstimatedTimeSec, nil
 }
 
-// AddEstimatedTime adds i to the "estimated_time" field.
-func (m *TodoMutation) AddEstimatedTime(i int32) {
-	if m.addestimated_time != nil {
-		*m.addestimated_time += i
+// AddEstimatedTimeSec adds i to the "estimated_time_sec" field.
+func (m *TodoMutation) AddEstimatedTimeSec(i int32) {
+	if m.addestimated_time_sec != nil {
+		*m.addestimated_time_sec += i
 	} else {
-		m.addestimated_time = &i
+		m.addestimated_time_sec = &i
 	}
 }
 
-// AddedEstimatedTime returns the value that was added to the "estimated_time" field in this mutation.
-func (m *TodoMutation) AddedEstimatedTime() (r int32, exists bool) {
-	v := m.addestimated_time
+// AddedEstimatedTimeSec returns the value that was added to the "estimated_time_sec" field in this mutation.
+func (m *TodoMutation) AddedEstimatedTimeSec() (r int32, exists bool) {
+	v := m.addestimated_time_sec
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetEstimatedTime resets all changes to the "estimated_time" field.
-func (m *TodoMutation) ResetEstimatedTime() {
-	m.estimated_time = nil
-	m.addestimated_time = nil
+// ResetEstimatedTimeSec resets all changes to the "estimated_time_sec" field.
+func (m *TodoMutation) ResetEstimatedTimeSec() {
+	m.estimated_time_sec = nil
+	m.addestimated_time_sec = nil
 }
 
-// SetActualTime sets the "actual_time" field.
-func (m *TodoMutation) SetActualTime(i int32) {
-	m.actual_time = &i
-	m.addactual_time = nil
+// SetActualTimeSec sets the "actual_time_sec" field.
+func (m *TodoMutation) SetActualTimeSec(i int32) {
+	m.actual_time_sec = &i
+	m.addactual_time_sec = nil
 }
 
-// ActualTime returns the value of the "actual_time" field in the mutation.
-func (m *TodoMutation) ActualTime() (r int32, exists bool) {
-	v := m.actual_time
+// ActualTimeSec returns the value of the "actual_time_sec" field in the mutation.
+func (m *TodoMutation) ActualTimeSec() (r int32, exists bool) {
+	v := m.actual_time_sec
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldActualTime returns the old "actual_time" field's value of the Todo entity.
+// OldActualTimeSec returns the old "actual_time_sec" field's value of the Todo entity.
 // If the Todo object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TodoMutation) OldActualTime(ctx context.Context) (v *int32, err error) {
+func (m *TodoMutation) OldActualTimeSec(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldActualTime is only allowed on UpdateOne operations")
+		return v, errors.New("OldActualTimeSec is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldActualTime requires an ID field in the mutation")
+		return v, errors.New("OldActualTimeSec requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldActualTime: %w", err)
+		return v, fmt.Errorf("querying old value for OldActualTimeSec: %w", err)
 	}
-	return oldValue.ActualTime, nil
+	return oldValue.ActualTimeSec, nil
 }
 
-// AddActualTime adds i to the "actual_time" field.
-func (m *TodoMutation) AddActualTime(i int32) {
-	if m.addactual_time != nil {
-		*m.addactual_time += i
+// AddActualTimeSec adds i to the "actual_time_sec" field.
+func (m *TodoMutation) AddActualTimeSec(i int32) {
+	if m.addactual_time_sec != nil {
+		*m.addactual_time_sec += i
 	} else {
-		m.addactual_time = &i
+		m.addactual_time_sec = &i
 	}
 }
 
-// AddedActualTime returns the value that was added to the "actual_time" field in this mutation.
-func (m *TodoMutation) AddedActualTime() (r int32, exists bool) {
-	v := m.addactual_time
+// AddedActualTimeSec returns the value that was added to the "actual_time_sec" field in this mutation.
+func (m *TodoMutation) AddedActualTimeSec() (r int32, exists bool) {
+	v := m.addactual_time_sec
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ClearActualTime clears the value of the "actual_time" field.
-func (m *TodoMutation) ClearActualTime() {
-	m.actual_time = nil
-	m.addactual_time = nil
-	m.clearedFields[todo.FieldActualTime] = struct{}{}
-}
-
-// ActualTimeCleared returns if the "actual_time" field was cleared in this mutation.
-func (m *TodoMutation) ActualTimeCleared() bool {
-	_, ok := m.clearedFields[todo.FieldActualTime]
-	return ok
-}
-
-// ResetActualTime resets all changes to the "actual_time" field.
-func (m *TodoMutation) ResetActualTime() {
-	m.actual_time = nil
-	m.addactual_time = nil
-	delete(m.clearedFields, todo.FieldActualTime)
+// ResetActualTimeSec resets all changes to the "actual_time_sec" field.
+func (m *TodoMutation) ResetActualTimeSec() {
+	m.actual_time_sec = nil
+	m.addactual_time_sec = nil
 }
 
 // SetDueDate sets the "due_date" field.
@@ -692,11 +678,11 @@ func (m *TodoMutation) Fields() []string {
 	if m.description != nil {
 		fields = append(fields, todo.FieldDescription)
 	}
-	if m.estimated_time != nil {
-		fields = append(fields, todo.FieldEstimatedTime)
+	if m.estimated_time_sec != nil {
+		fields = append(fields, todo.FieldEstimatedTimeSec)
 	}
-	if m.actual_time != nil {
-		fields = append(fields, todo.FieldActualTime)
+	if m.actual_time_sec != nil {
+		fields = append(fields, todo.FieldActualTimeSec)
 	}
 	if m.due_date != nil {
 		fields = append(fields, todo.FieldDueDate)
@@ -726,10 +712,10 @@ func (m *TodoMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case todo.FieldDescription:
 		return m.Description()
-	case todo.FieldEstimatedTime:
-		return m.EstimatedTime()
-	case todo.FieldActualTime:
-		return m.ActualTime()
+	case todo.FieldEstimatedTimeSec:
+		return m.EstimatedTimeSec()
+	case todo.FieldActualTimeSec:
+		return m.ActualTimeSec()
 	case todo.FieldDueDate:
 		return m.DueDate()
 	case todo.FieldPriority:
@@ -755,10 +741,10 @@ func (m *TodoMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldName(ctx)
 	case todo.FieldDescription:
 		return m.OldDescription(ctx)
-	case todo.FieldEstimatedTime:
-		return m.OldEstimatedTime(ctx)
-	case todo.FieldActualTime:
-		return m.OldActualTime(ctx)
+	case todo.FieldEstimatedTimeSec:
+		return m.OldEstimatedTimeSec(ctx)
+	case todo.FieldActualTimeSec:
+		return m.OldActualTimeSec(ctx)
 	case todo.FieldDueDate:
 		return m.OldDueDate(ctx)
 	case todo.FieldPriority:
@@ -804,19 +790,19 @@ func (m *TodoMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDescription(v)
 		return nil
-	case todo.FieldEstimatedTime:
+	case todo.FieldEstimatedTimeSec:
 		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetEstimatedTime(v)
+		m.SetEstimatedTimeSec(v)
 		return nil
-	case todo.FieldActualTime:
+	case todo.FieldActualTimeSec:
 		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetActualTime(v)
+		m.SetActualTimeSec(v)
 		return nil
 	case todo.FieldDueDate:
 		v, ok := value.(time.Time)
@@ -854,11 +840,11 @@ func (m *TodoMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *TodoMutation) AddedFields() []string {
 	var fields []string
-	if m.addestimated_time != nil {
-		fields = append(fields, todo.FieldEstimatedTime)
+	if m.addestimated_time_sec != nil {
+		fields = append(fields, todo.FieldEstimatedTimeSec)
 	}
-	if m.addactual_time != nil {
-		fields = append(fields, todo.FieldActualTime)
+	if m.addactual_time_sec != nil {
+		fields = append(fields, todo.FieldActualTimeSec)
 	}
 	return fields
 }
@@ -868,10 +854,10 @@ func (m *TodoMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *TodoMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case todo.FieldEstimatedTime:
-		return m.AddedEstimatedTime()
-	case todo.FieldActualTime:
-		return m.AddedActualTime()
+	case todo.FieldEstimatedTimeSec:
+		return m.AddedEstimatedTimeSec()
+	case todo.FieldActualTimeSec:
+		return m.AddedActualTimeSec()
 	}
 	return nil, false
 }
@@ -881,19 +867,19 @@ func (m *TodoMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *TodoMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case todo.FieldEstimatedTime:
+	case todo.FieldEstimatedTimeSec:
 		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddEstimatedTime(v)
+		m.AddEstimatedTimeSec(v)
 		return nil
-	case todo.FieldActualTime:
+	case todo.FieldActualTimeSec:
 		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddActualTime(v)
+		m.AddActualTimeSec(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Todo numeric field %s", name)
@@ -905,9 +891,6 @@ func (m *TodoMutation) ClearedFields() []string {
 	var fields []string
 	if m.FieldCleared(todo.FieldDescription) {
 		fields = append(fields, todo.FieldDescription)
-	}
-	if m.FieldCleared(todo.FieldActualTime) {
-		fields = append(fields, todo.FieldActualTime)
 	}
 	if m.FieldCleared(todo.FieldDueDate) {
 		fields = append(fields, todo.FieldDueDate)
@@ -931,9 +914,6 @@ func (m *TodoMutation) ClearField(name string) error {
 	switch name {
 	case todo.FieldDescription:
 		m.ClearDescription()
-		return nil
-	case todo.FieldActualTime:
-		m.ClearActualTime()
 		return nil
 	case todo.FieldDueDate:
 		m.ClearDueDate()
@@ -961,11 +941,11 @@ func (m *TodoMutation) ResetField(name string) error {
 	case todo.FieldDescription:
 		m.ResetDescription()
 		return nil
-	case todo.FieldEstimatedTime:
-		m.ResetEstimatedTime()
+	case todo.FieldEstimatedTimeSec:
+		m.ResetEstimatedTimeSec()
 		return nil
-	case todo.FieldActualTime:
-		m.ResetActualTime()
+	case todo.FieldActualTimeSec:
+		m.ResetActualTimeSec()
 		return nil
 	case todo.FieldDueDate:
 		m.ResetDueDate()

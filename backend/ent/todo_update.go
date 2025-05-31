@@ -69,51 +69,45 @@ func (tu *TodoUpdate) ClearDescription() *TodoUpdate {
 	return tu
 }
 
-// SetEstimatedTime sets the "estimated_time" field.
-func (tu *TodoUpdate) SetEstimatedTime(i int32) *TodoUpdate {
-	tu.mutation.ResetEstimatedTime()
-	tu.mutation.SetEstimatedTime(i)
+// SetEstimatedTimeSec sets the "estimated_time_sec" field.
+func (tu *TodoUpdate) SetEstimatedTimeSec(i int32) *TodoUpdate {
+	tu.mutation.ResetEstimatedTimeSec()
+	tu.mutation.SetEstimatedTimeSec(i)
 	return tu
 }
 
-// SetNillableEstimatedTime sets the "estimated_time" field if the given value is not nil.
-func (tu *TodoUpdate) SetNillableEstimatedTime(i *int32) *TodoUpdate {
+// SetNillableEstimatedTimeSec sets the "estimated_time_sec" field if the given value is not nil.
+func (tu *TodoUpdate) SetNillableEstimatedTimeSec(i *int32) *TodoUpdate {
 	if i != nil {
-		tu.SetEstimatedTime(*i)
+		tu.SetEstimatedTimeSec(*i)
 	}
 	return tu
 }
 
-// AddEstimatedTime adds i to the "estimated_time" field.
-func (tu *TodoUpdate) AddEstimatedTime(i int32) *TodoUpdate {
-	tu.mutation.AddEstimatedTime(i)
+// AddEstimatedTimeSec adds i to the "estimated_time_sec" field.
+func (tu *TodoUpdate) AddEstimatedTimeSec(i int32) *TodoUpdate {
+	tu.mutation.AddEstimatedTimeSec(i)
 	return tu
 }
 
-// SetActualTime sets the "actual_time" field.
-func (tu *TodoUpdate) SetActualTime(i int32) *TodoUpdate {
-	tu.mutation.ResetActualTime()
-	tu.mutation.SetActualTime(i)
+// SetActualTimeSec sets the "actual_time_sec" field.
+func (tu *TodoUpdate) SetActualTimeSec(i int32) *TodoUpdate {
+	tu.mutation.ResetActualTimeSec()
+	tu.mutation.SetActualTimeSec(i)
 	return tu
 }
 
-// SetNillableActualTime sets the "actual_time" field if the given value is not nil.
-func (tu *TodoUpdate) SetNillableActualTime(i *int32) *TodoUpdate {
+// SetNillableActualTimeSec sets the "actual_time_sec" field if the given value is not nil.
+func (tu *TodoUpdate) SetNillableActualTimeSec(i *int32) *TodoUpdate {
 	if i != nil {
-		tu.SetActualTime(*i)
+		tu.SetActualTimeSec(*i)
 	}
 	return tu
 }
 
-// AddActualTime adds i to the "actual_time" field.
-func (tu *TodoUpdate) AddActualTime(i int32) *TodoUpdate {
-	tu.mutation.AddActualTime(i)
-	return tu
-}
-
-// ClearActualTime clears the value of the "actual_time" field.
-func (tu *TodoUpdate) ClearActualTime() *TodoUpdate {
-	tu.mutation.ClearActualTime()
+// AddActualTimeSec adds i to the "actual_time_sec" field.
+func (tu *TodoUpdate) AddActualTimeSec(i int32) *TodoUpdate {
+	tu.mutation.AddActualTimeSec(i)
 	return tu
 }
 
@@ -263,14 +257,14 @@ func (tu *TodoUpdate) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Todo.description": %w`, err)}
 		}
 	}
-	if v, ok := tu.mutation.EstimatedTime(); ok {
-		if err := todo.EstimatedTimeValidator(v); err != nil {
-			return &ValidationError{Name: "estimated_time", err: fmt.Errorf(`ent: validator failed for field "Todo.estimated_time": %w`, err)}
+	if v, ok := tu.mutation.EstimatedTimeSec(); ok {
+		if err := todo.EstimatedTimeSecValidator(v); err != nil {
+			return &ValidationError{Name: "estimated_time_sec", err: fmt.Errorf(`ent: validator failed for field "Todo.estimated_time_sec": %w`, err)}
 		}
 	}
-	if v, ok := tu.mutation.ActualTime(); ok {
-		if err := todo.ActualTimeValidator(v); err != nil {
-			return &ValidationError{Name: "actual_time", err: fmt.Errorf(`ent: validator failed for field "Todo.actual_time": %w`, err)}
+	if v, ok := tu.mutation.ActualTimeSec(); ok {
+		if err := todo.ActualTimeSecValidator(v); err != nil {
+			return &ValidationError{Name: "actual_time_sec", err: fmt.Errorf(`ent: validator failed for field "Todo.actual_time_sec": %w`, err)}
 		}
 	}
 	if v, ok := tu.mutation.Priority(); ok {
@@ -315,20 +309,17 @@ func (tu *TodoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if tu.mutation.DescriptionCleared() {
 		_spec.ClearField(todo.FieldDescription, field.TypeString)
 	}
-	if value, ok := tu.mutation.EstimatedTime(); ok {
-		_spec.SetField(todo.FieldEstimatedTime, field.TypeInt32, value)
+	if value, ok := tu.mutation.EstimatedTimeSec(); ok {
+		_spec.SetField(todo.FieldEstimatedTimeSec, field.TypeInt32, value)
 	}
-	if value, ok := tu.mutation.AddedEstimatedTime(); ok {
-		_spec.AddField(todo.FieldEstimatedTime, field.TypeInt32, value)
+	if value, ok := tu.mutation.AddedEstimatedTimeSec(); ok {
+		_spec.AddField(todo.FieldEstimatedTimeSec, field.TypeInt32, value)
 	}
-	if value, ok := tu.mutation.ActualTime(); ok {
-		_spec.SetField(todo.FieldActualTime, field.TypeInt32, value)
+	if value, ok := tu.mutation.ActualTimeSec(); ok {
+		_spec.SetField(todo.FieldActualTimeSec, field.TypeInt32, value)
 	}
-	if value, ok := tu.mutation.AddedActualTime(); ok {
-		_spec.AddField(todo.FieldActualTime, field.TypeInt32, value)
-	}
-	if tu.mutation.ActualTimeCleared() {
-		_spec.ClearField(todo.FieldActualTime, field.TypeInt32)
+	if value, ok := tu.mutation.AddedActualTimeSec(); ok {
+		_spec.AddField(todo.FieldActualTimeSec, field.TypeInt32, value)
 	}
 	if value, ok := tu.mutation.DueDate(); ok {
 		_spec.SetField(todo.FieldDueDate, field.TypeTime, value)
@@ -437,51 +428,45 @@ func (tuo *TodoUpdateOne) ClearDescription() *TodoUpdateOne {
 	return tuo
 }
 
-// SetEstimatedTime sets the "estimated_time" field.
-func (tuo *TodoUpdateOne) SetEstimatedTime(i int32) *TodoUpdateOne {
-	tuo.mutation.ResetEstimatedTime()
-	tuo.mutation.SetEstimatedTime(i)
+// SetEstimatedTimeSec sets the "estimated_time_sec" field.
+func (tuo *TodoUpdateOne) SetEstimatedTimeSec(i int32) *TodoUpdateOne {
+	tuo.mutation.ResetEstimatedTimeSec()
+	tuo.mutation.SetEstimatedTimeSec(i)
 	return tuo
 }
 
-// SetNillableEstimatedTime sets the "estimated_time" field if the given value is not nil.
-func (tuo *TodoUpdateOne) SetNillableEstimatedTime(i *int32) *TodoUpdateOne {
+// SetNillableEstimatedTimeSec sets the "estimated_time_sec" field if the given value is not nil.
+func (tuo *TodoUpdateOne) SetNillableEstimatedTimeSec(i *int32) *TodoUpdateOne {
 	if i != nil {
-		tuo.SetEstimatedTime(*i)
+		tuo.SetEstimatedTimeSec(*i)
 	}
 	return tuo
 }
 
-// AddEstimatedTime adds i to the "estimated_time" field.
-func (tuo *TodoUpdateOne) AddEstimatedTime(i int32) *TodoUpdateOne {
-	tuo.mutation.AddEstimatedTime(i)
+// AddEstimatedTimeSec adds i to the "estimated_time_sec" field.
+func (tuo *TodoUpdateOne) AddEstimatedTimeSec(i int32) *TodoUpdateOne {
+	tuo.mutation.AddEstimatedTimeSec(i)
 	return tuo
 }
 
-// SetActualTime sets the "actual_time" field.
-func (tuo *TodoUpdateOne) SetActualTime(i int32) *TodoUpdateOne {
-	tuo.mutation.ResetActualTime()
-	tuo.mutation.SetActualTime(i)
+// SetActualTimeSec sets the "actual_time_sec" field.
+func (tuo *TodoUpdateOne) SetActualTimeSec(i int32) *TodoUpdateOne {
+	tuo.mutation.ResetActualTimeSec()
+	tuo.mutation.SetActualTimeSec(i)
 	return tuo
 }
 
-// SetNillableActualTime sets the "actual_time" field if the given value is not nil.
-func (tuo *TodoUpdateOne) SetNillableActualTime(i *int32) *TodoUpdateOne {
+// SetNillableActualTimeSec sets the "actual_time_sec" field if the given value is not nil.
+func (tuo *TodoUpdateOne) SetNillableActualTimeSec(i *int32) *TodoUpdateOne {
 	if i != nil {
-		tuo.SetActualTime(*i)
+		tuo.SetActualTimeSec(*i)
 	}
 	return tuo
 }
 
-// AddActualTime adds i to the "actual_time" field.
-func (tuo *TodoUpdateOne) AddActualTime(i int32) *TodoUpdateOne {
-	tuo.mutation.AddActualTime(i)
-	return tuo
-}
-
-// ClearActualTime clears the value of the "actual_time" field.
-func (tuo *TodoUpdateOne) ClearActualTime() *TodoUpdateOne {
-	tuo.mutation.ClearActualTime()
+// AddActualTimeSec adds i to the "actual_time_sec" field.
+func (tuo *TodoUpdateOne) AddActualTimeSec(i int32) *TodoUpdateOne {
+	tuo.mutation.AddActualTimeSec(i)
 	return tuo
 }
 
@@ -644,14 +629,14 @@ func (tuo *TodoUpdateOne) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Todo.description": %w`, err)}
 		}
 	}
-	if v, ok := tuo.mutation.EstimatedTime(); ok {
-		if err := todo.EstimatedTimeValidator(v); err != nil {
-			return &ValidationError{Name: "estimated_time", err: fmt.Errorf(`ent: validator failed for field "Todo.estimated_time": %w`, err)}
+	if v, ok := tuo.mutation.EstimatedTimeSec(); ok {
+		if err := todo.EstimatedTimeSecValidator(v); err != nil {
+			return &ValidationError{Name: "estimated_time_sec", err: fmt.Errorf(`ent: validator failed for field "Todo.estimated_time_sec": %w`, err)}
 		}
 	}
-	if v, ok := tuo.mutation.ActualTime(); ok {
-		if err := todo.ActualTimeValidator(v); err != nil {
-			return &ValidationError{Name: "actual_time", err: fmt.Errorf(`ent: validator failed for field "Todo.actual_time": %w`, err)}
+	if v, ok := tuo.mutation.ActualTimeSec(); ok {
+		if err := todo.ActualTimeSecValidator(v); err != nil {
+			return &ValidationError{Name: "actual_time_sec", err: fmt.Errorf(`ent: validator failed for field "Todo.actual_time_sec": %w`, err)}
 		}
 	}
 	if v, ok := tuo.mutation.Priority(); ok {
@@ -713,20 +698,17 @@ func (tuo *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) 
 	if tuo.mutation.DescriptionCleared() {
 		_spec.ClearField(todo.FieldDescription, field.TypeString)
 	}
-	if value, ok := tuo.mutation.EstimatedTime(); ok {
-		_spec.SetField(todo.FieldEstimatedTime, field.TypeInt32, value)
+	if value, ok := tuo.mutation.EstimatedTimeSec(); ok {
+		_spec.SetField(todo.FieldEstimatedTimeSec, field.TypeInt32, value)
 	}
-	if value, ok := tuo.mutation.AddedEstimatedTime(); ok {
-		_spec.AddField(todo.FieldEstimatedTime, field.TypeInt32, value)
+	if value, ok := tuo.mutation.AddedEstimatedTimeSec(); ok {
+		_spec.AddField(todo.FieldEstimatedTimeSec, field.TypeInt32, value)
 	}
-	if value, ok := tuo.mutation.ActualTime(); ok {
-		_spec.SetField(todo.FieldActualTime, field.TypeInt32, value)
+	if value, ok := tuo.mutation.ActualTimeSec(); ok {
+		_spec.SetField(todo.FieldActualTimeSec, field.TypeInt32, value)
 	}
-	if value, ok := tuo.mutation.AddedActualTime(); ok {
-		_spec.AddField(todo.FieldActualTime, field.TypeInt32, value)
-	}
-	if tuo.mutation.ActualTimeCleared() {
-		_spec.ClearField(todo.FieldActualTime, field.TypeInt32)
+	if value, ok := tuo.mutation.AddedActualTimeSec(); ok {
+		_spec.AddField(todo.FieldActualTimeSec, field.TypeInt32, value)
 	}
 	if value, ok := tuo.mutation.DueDate(); ok {
 		_spec.SetField(todo.FieldDueDate, field.TypeTime, value)

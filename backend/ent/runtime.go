@@ -51,14 +51,18 @@ func init() {
 	todoDescDescription := todoFields[1].Descriptor()
 	// todo.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	todo.DescriptionValidator = todoDescDescription.Validators[0].(func(string) error)
-	// todoDescEstimatedTime is the schema descriptor for estimated_time field.
-	todoDescEstimatedTime := todoFields[2].Descriptor()
-	// todo.EstimatedTimeValidator is a validator for the "estimated_time" field. It is called by the builders before save.
-	todo.EstimatedTimeValidator = todoDescEstimatedTime.Validators[0].(func(int32) error)
-	// todoDescActualTime is the schema descriptor for actual_time field.
-	todoDescActualTime := todoFields[3].Descriptor()
-	// todo.ActualTimeValidator is a validator for the "actual_time" field. It is called by the builders before save.
-	todo.ActualTimeValidator = todoDescActualTime.Validators[0].(func(int32) error)
+	// todoDescEstimatedTimeSec is the schema descriptor for estimated_time_sec field.
+	todoDescEstimatedTimeSec := todoFields[2].Descriptor()
+	// todo.DefaultEstimatedTimeSec holds the default value on creation for the estimated_time_sec field.
+	todo.DefaultEstimatedTimeSec = todoDescEstimatedTimeSec.Default.(int32)
+	// todo.EstimatedTimeSecValidator is a validator for the "estimated_time_sec" field. It is called by the builders before save.
+	todo.EstimatedTimeSecValidator = todoDescEstimatedTimeSec.Validators[0].(func(int32) error)
+	// todoDescActualTimeSec is the schema descriptor for actual_time_sec field.
+	todoDescActualTimeSec := todoFields[3].Descriptor()
+	// todo.DefaultActualTimeSec holds the default value on creation for the actual_time_sec field.
+	todo.DefaultActualTimeSec = todoDescActualTimeSec.Default.(int32)
+	// todo.ActualTimeSecValidator is a validator for the "actual_time_sec" field. It is called by the builders before save.
+	todo.ActualTimeSecValidator = todoDescActualTimeSec.Validators[0].(func(int32) error)
 	// todoDescReflectionMemo is the schema descriptor for reflection_memo field.
 	todoDescReflectionMemo := todoFields[7].Descriptor()
 	// todo.ReflectionMemoValidator is a validator for the "reflection_memo" field. It is called by the builders before save.
