@@ -49,15 +49,15 @@ func toAPITodo(entTodo *ent.Todo) *api.Todo {
 	}
 
 	return &api.Todo{
-		Id:             utils.Ptr(entTodo.ID), // Use utils.Ptr for nullable ID in API spec.
-		Name:           entTodo.Name,
-		Description:    entTodo.Description,
-		EstimatedTime:  entTodo.EstimatedTime,
-		ActualTime:     entTodo.ActualTime,
-		DueDate:        dueDatePtr,
-		Priority:       api.TodoPriority(entTodo.Priority), // Cast to API enum type.
-		Status:         api.TodoStatus(entTodo.Status),     // Cast to API enum type.
-		ReflectionMemo: entTodo.ReflectionMemo,
+		Id:               utils.Ptr(entTodo.ID), // Use utils.Ptr for nullable ID in API spec.
+		Name:             entTodo.Name,
+		Description:      entTodo.Description,
+		EstimatedTimeSec: entTodo.EstimatedTimeSec,
+		ActualTimeSec:    entTodo.ActualTimeSec,
+		DueDate:          dueDatePtr,
+		Priority:         api.TodoPriority(entTodo.Priority), // Cast to API enum type.
+		Status:           api.TodoStatus(entTodo.Status),     // Cast to API enum type.
+		ReflectionMemo:   entTodo.ReflectionMemo,
 	}
 }
 
@@ -101,14 +101,14 @@ func (s *TodoService) CreateTodo(ctx context.Context, reqBody api.TodoCreationRe
 	if reqBody.Name == "" { // OpenAPI schema has minLength: 1, so this should usually be caught by Handler/oapi-codegen.
 		return nil, ErrNameRequired
 	}
-	if reqBody.EstimatedTime <= 0 { // OpenAPI schema has minimum: 1.
-		return nil, fmt.Errorf("%w: estimatedTime must be positive", ErrValidationFailed)
+	if reqBody.EstimatedTimeSec <= 0 { // OpenAPI schema has minimum: 1.
+		return nil, fmt.Errorf("%w: EstimatedTimeSec must be positive", ErrValidationFailed)
 	}
 
 	// 2. Prepare ent's Create builder.
 	createBuilder := s.client.Todo.Create().
 		SetName(reqBody.Name).
-		SetEstimatedTime(reqBody.EstimatedTime)
+		SetEstimatedTimeSec(reqBody.EstimatedTimeSec)
 
 	// Set optional fields.
 	if reqBody.Description != nil {
@@ -152,4 +152,105 @@ func (s *TodoService) CreateTodo(ctx context.Context, reqBody api.TodoCreationRe
 
 	// Convert the newly created ent.Todo to api.Todo DTO.
 	return toAPITodo(newEntTodo), nil
+}
+
+// UpdateTodo updates an existing TODO item in the database.
+func (s *TodoService) UpdateTodo(ctx context.Context, todoId int32, reqBody api.TodoUpdateRequest) (*api.Todo, error) {
+	// 1. Fetch the existing todo to ensure it exists.
+	existingTodo, err := s.client.Todo.Get(ctx, int(todoId))
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, ErrTodoNotFound
+		}
+		return nil, fmt.Errorf("failed to get todo for update: %w", err)
+	}
+
+	// 2. Prepare ent's UpdateOne builder.
+	updateBuilder := s.client.Todo.UpdateOne(existingTodo)
+
+	// 3. Apply updates from reqBody if fields are provided.
+	// Note: oapi-codegen ensures minProperties: 1 for TodoUpdateRequest.
+	// The handler should have already validated this.
+
+	if reqBody.Name != nil {
+		if *reqBody.Name == "" { // Additional validation if needed, though schema has minLength
+			return nil, fmt.Errorf("%w: name cannot be empty when provided for update", ErrValidationFailed)
+		}
+		updateBuilder.SetName(*reqBody.Name)
+	}
+
+	if reqBody.Description != nil {
+		// SetNillableDescription handles both setting a value and setting to null.
+		updateBuilder.SetNillableDescription(reqBody.Description)
+	}
+
+	if reqBody.EstimatedTimeSec != nil {
+		if *reqBody.EstimatedTimeSec <= 0 { // Schema has minimum: 1
+			return nil, fmt.Errorf("%w: EstimatedTimeSec must be positive when provided for update", ErrValidationFailed)
+		}
+		// ent.Todo.EstimatedTimeSec is int32, reqBody.EstimatedTimeSec is *int32
+		updateBuilder.SetEstimatedTimeSec(*reqBody.EstimatedTimeSec)
+	}
+
+	if reqBody.ActualTimeSec != nil {
+		// ent.Todo.ActualTimeSec is *int32, reqBody.ActualTimeSec is *int32
+		// SetNillableActualTimeSec handles setting to a value or to null.
+		updateBuilder.SetNillableActualTimeSec(reqBody.ActualTimeSec)
+	}
+
+	if reqBody.DueDate != nil {
+		if reqBody.DueDate.IsZero() { // Treat zero date as clearing the due date
+			updateBuilder.ClearDueDate()
+		} else {
+			parsedDueDate, err := time.Parse("2006-01-02", reqBody.DueDate.Format("2006-01-02"))
+			if err == nil {
+				updateBuilder.SetDueDate(parsedDueDate)
+			} else {
+				return nil, fmt.Errorf("%w: invalid due date format for update", ErrValidationFailed)
+			}
+		}
+	}
+
+	if reqBody.Priority != nil {
+		p := todo.Priority(*reqBody.Priority)
+		if err := todo.PriorityValidator(p); err != nil {
+			return nil, fmt.Errorf("%w: %v", ErrPriorityInvalid, err)
+		}
+		updateBuilder.SetPriority(p)
+	}
+
+	if reqBody.Status != nil {
+		st := todo.Status(*reqBody.Status)
+		if err := todo.StatusValidator(st); err != nil {
+			return nil, fmt.Errorf("%w: %v", ErrStatusInvalid, err)
+		}
+		updateBuilder.SetStatus(st)
+	}
+
+	if reqBody.ReflectionMemo != nil {
+		updateBuilder.SetNillableReflectionMemo(reqBody.ReflectionMemo)
+	}
+
+	// 4. Save changes to the database.
+	updatedEntTodo, err := updateBuilder.Save(ctx)
+	if err != nil {
+		if ent.IsValidationError(err) {
+			return nil, fmt.Errorf("%w: %v", ErrValidationFailed, err)
+		}
+		return nil, fmt.Errorf("failed to update todo in database: %w", err)
+	}
+
+	return toAPITodo(updatedEntTodo), nil
+}
+
+// DeleteTodo deletes a TODO item from the database by its ID.
+func (s *TodoService) DeleteTodo(ctx context.Context, todoId int32) error {
+	err := s.client.Todo.DeleteOneID(int(todoId)).Exec(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return ErrTodoNotFound
+		}
+		return fmt.Errorf("failed to delete todo from database: %w", err)
+	}
+	return nil
 }
