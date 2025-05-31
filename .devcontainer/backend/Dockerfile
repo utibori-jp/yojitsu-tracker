@@ -7,5 +7,3 @@ RUN apk update && \
     rm -rf /var/cache/apk/*
 
 RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
-
-RUN go mod tidy

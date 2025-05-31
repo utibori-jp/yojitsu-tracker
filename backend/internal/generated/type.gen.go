@@ -118,7 +118,7 @@ type TodoUpdateRequest struct {
 	// DueDate Due date for the task (YYYY-MM-DD).
 	DueDate *openapi_types.Date `json:"dueDate"`
 
-	// EstimatedTimeSec Estimated time to complete the task in minutes. If omitted in an update, defaults to 1.
+	// EstimatedTimeSec Estimated time to complete the task in seconds. If omitted in an update, the existing value is not changed.
 	EstimatedTimeSec *int32 `json:"estimatedTimeSec,omitempty"`
 
 	// Name Name of the task.

@@ -20,45 +20,45 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Create a new TODO
-	// (POST /todo)
-	CreateTodo(w http.ResponseWriter, r *http.Request)
-	// Delete a TODO
-	// (DELETE /todo/{todoId})
-	DeleteTodo(w http.ResponseWriter, r *http.Request, todoId int32)
-	// Update an existing TODO
-	// (PUT /todo/{todoId})
-	UpdateTodo(w http.ResponseWriter, r *http.Request, todoId int32)
 	// List all TODOs
 	// (GET /todos)
 	ListTodos(w http.ResponseWriter, r *http.Request)
+	// Create a new TODO
+	// (POST /todos)
+	CreateTodo(w http.ResponseWriter, r *http.Request)
+	// Delete a TODO
+	// (DELETE /todos/{todoId})
+	DeleteTodo(w http.ResponseWriter, r *http.Request, todoId int32)
+	// Update an existing TODO
+	// (PUT /todos/{todoId})
+	UpdateTodo(w http.ResponseWriter, r *http.Request, todoId int32)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
 
+// List all TODOs
+// (GET /todos)
+func (_ Unimplemented) ListTodos(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // Create a new TODO
-// (POST /todo)
+// (POST /todos)
 func (_ Unimplemented) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
 // Delete a TODO
-// (DELETE /todo/{todoId})
+// (DELETE /todos/{todoId})
 func (_ Unimplemented) DeleteTodo(w http.ResponseWriter, r *http.Request, todoId int32) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
 // Update an existing TODO
-// (PUT /todo/{todoId})
+// (PUT /todos/{todoId})
 func (_ Unimplemented) UpdateTodo(w http.ResponseWriter, r *http.Request, todoId int32) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// List all TODOs
-// (GET /todos)
-func (_ Unimplemented) ListTodos(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -70,6 +70,20 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// ListTodos operation middleware
+func (siw *ServerInterfaceWrapper) ListTodos(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListTodos(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // CreateTodo operation middleware
 func (siw *ServerInterfaceWrapper) CreateTodo(w http.ResponseWriter, r *http.Request) {
@@ -126,20 +140,6 @@ func (siw *ServerInterfaceWrapper) UpdateTodo(w http.ResponseWriter, r *http.Req
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateTodo(w, r, todoId)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
-// ListTodos operation middleware
-func (siw *ServerInterfaceWrapper) ListTodos(w http.ResponseWriter, r *http.Request) {
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ListTodos(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -263,16 +263,16 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/todo", wrapper.CreateTodo)
-	})
-	r.Group(func(r chi.Router) {
-		r.Delete(options.BaseURL+"/todo/{todoId}", wrapper.DeleteTodo)
-	})
-	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/todo/{todoId}", wrapper.UpdateTodo)
-	})
-	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/todos", wrapper.ListTodos)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/todos", wrapper.CreateTodo)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/todos/{todoId}", wrapper.DeleteTodo)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/todos/{todoId}", wrapper.UpdateTodo)
 	})
 
 	return r
@@ -281,33 +281,33 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"2qdmcTVZ/R4AAP//IEkFs6UbAAA=",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

@@ -17,8 +17,8 @@ start-backend:
 	@go run cmd/api/main.go -a
 	@echo "Finish backend..."
 
-.PHONY: ent-generate
-ent-generate:
+.PHONY: gen-ent
+gen-ent:
 	@echo "Generating schemas with ent"
 	go generate ./ent
 	@echo "Finish generating schemas"
