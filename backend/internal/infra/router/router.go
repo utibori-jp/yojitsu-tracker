@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	mw "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	oapiMw "github.com/oapi-codegen/nethttp-middleware"
 )
 
@@ -22,12 +23,26 @@ func NewRouter(server *handler.Server) *chi.Mux {
 		log.Fatalf("Error loading swagger spec: %s", err)
 	}
 
+	// --- CORS Configuration ---
+	// Setup CORS middleware with permissive settings for development.
+	// For production, you should restrict origins, methods, and headers.
+	corsMiddleware := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"}, // Allow all origins
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // Maximum value not ignored by any major browsers
+	})
+
 	// Apply middleware to the router.
-	r.Use(mw.RequestID) // Injects a request ID into the context of each request.
-	r.Use(mw.RealIP)    // Sets the RemoteAddr to the X-Forwarded-For or X-Real-IP header.
-	r.Use(mw.Logger)    // Logs the start and end of each request with the path, method, status, and duration.
-	r.Use(mw.Recoverer) // Recovers from panics and returns a 500 error.
+	r.Use(corsMiddleware.Handler) // Add CORS middleware first or early.
+	r.Use(mw.RequestID)           // Injects a request ID into the context of each request.
+	r.Use(mw.RealIP)              // Sets the RemoteAddr to the X-Forwarded-For or X-Real-IP header.
+	r.Use(mw.Logger)              // Logs the start and end of each request with the path, method, status, and duration.
+	r.Use(mw.Recoverer)           // Recovers from panics and returns a 500 error.
 	// TODO: Enable StripSlashes. Currently, it conflicts with OpenAPI request validation.
+	// Consider if StripSlashes is needed after CORS and OAPI validation.
 	// r.Use(mw.StripSlashes)
 	r.Use(oapiMw.OapiRequestValidator(swagger)) // Validates incoming requests against the OpenAPI 3 specification.
 

@@ -137,7 +137,7 @@ components:
           type: integer
           format: int32
           minimum: 1
-          description: Estimated time to complete the task in minutes. If omitted in an update, defaults to 1.
+          description: Estimated time to complete the task in seconds. If omitted in an update, the existing value is not changed.
           example: 90
         actualTimeSec:
           type: integer
@@ -207,8 +207,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
-  /todo:
+  # Path for creating a new TODO item, conventionally POST to the collection URI /todos
     post:
       summary: Create a new TODO
       description: Adds a new TODO item to the list.
@@ -236,7 +235,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /todo/{todoId}: # Note: singular 'todo' for specific resource operations
+  # Path for operations on a specific TODO item
+  /todos/{todoId}: # Changed from /todo/{todoId} to /todos/{todoId} for consistency
     parameters:
       - name: todoId
         in: path

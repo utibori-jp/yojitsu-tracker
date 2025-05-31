@@ -41,9 +41,10 @@ func (h *TodoHandler) ListTodos(w http.ResponseWriter, r *http.Request) {
 	// Encode the list of todos into the response body.
 	if err := json.NewEncoder(w).Encode(todos); err != nil {
 		log.Printf("Error encoding todos response: %v", err)
-		// If encoding fails, it's a server-side issue.
-		// Note: Headers might have already been written, so http.Error is a fallback.
-		// Consider if a more specific error response is needed here or if logging is sufficient.
+		// If encoding fails, it's a server-side issue. The client will have already received
+		// a success status code (200 OK), but the response body may be incomplete or malformed.
+		// At this point, we can only log the error. Attempting to send a new HTTP error
+		// status (e.g., via http.Error) is not feasible because headers are already sent.
 	}
 }
 
