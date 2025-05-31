@@ -1,17 +1,34 @@
 {
     "name": "Backend Container",
-    "dockerComposeFile": ["../docker-compose.yml"],
+    "dockerComposeFile": [
+        "../docker-compose.yml"
+    ],
     "service": "backend",
     "workspaceFolder": "/workspace",
-    "features": 
-        {
-            "ghcr.io/devcontainers/features/common-utils:2": {}
-        },
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {}
+    },
     "postCreateCommand": "echo success",
     "customizations": {
         "vscode": {
+            "extensions": [
+                "golang.go",
+                "Google.gemini-code-assist",
+                "arjun.swagger-viewer"
+            ],
             "settings": {
-                "terminal.integrated.cwd": "/workspace/backend"
+                "terminal.integrated.cwd": "/workspace/backend",
+                // General editor setting - good for consistency
+                "editor.formatOnSave": true,
+                // Go-specific settings
+                "[go]": {
+                    "editor.defaultFormatter": "golang.go",
+                    // Ensures formatOnSave is true for Go files, using the Go formatter
+                    "editor.formatOnSave": true
+                },
+                "go.lintOnSave": "package", // Lint the package on save
+                "go.useLanguageServer": true, // Explicitly enable gopls
+                "go.toolsManagement.autoUpdate": true // Auto-update Go tools like gopls, linters, etc.
             }
         }
     }
