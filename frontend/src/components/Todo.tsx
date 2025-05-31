@@ -20,7 +20,7 @@ interface Props {
 const TodoItem: React.FC<Props> = ({ todo }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [status, setStatus] = useState<Todo["status"]>(todo.status);
-  const [actualTime, setActualTime] = useState(todo.actualTime ?? 0);
+  const [actualTimeSec, setActualTimeSec] = useState(todo.actualTimeSec ?? 0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // "TODO: 各ハンドルの実装"
@@ -45,11 +45,11 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
-      // TODO: API call to update actualTime
+      // TODO: API call to update actualTimeSec
     } else {
       setStatus("doing");
       intervalRef.current = setInterval(() => {
-        setActualTime((prevTime) => prevTime + 1);
+        setActualTimeSec((prevTime) => prevTime + 1);
       }, 1000);
     }
   };
@@ -117,7 +117,7 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
       </div>
       <div>
         <div>
-          予定: {todo.estimatedTime} 分 / 実績: {timeFormat(actualTime)}
+          予定: {todo.estimatedTimeSec} 分 / 実績: {timeFormat(actualTimeSec)}
         </div>
       </div>
     </div>

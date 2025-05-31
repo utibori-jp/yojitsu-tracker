@@ -11,7 +11,7 @@ interface Props {
 const defaultFormData: TodoCreationRequest = {
   name: "",
   description: "",
-  estimatedTime: 1,
+  estimatedTimeSec: 60,
   dueDate: undefined,
   priority: "medium",
 };
@@ -29,7 +29,8 @@ const TodoForm: React.FC<Props> = ({ initialData, onSubmitSuccess }) => {
     const { name, value } = e.target;
 
     const parsers: Record<string, (val: string) => number | undefined> = {
-      estimatedTime: Number,
+      // 分から秒への変換
+      estimatedTimeSec: (val: string) => Number(val) * 60,
     };
 
     const parse = parsers[name] ?? ((val: string) => val);
@@ -102,9 +103,9 @@ const TodoForm: React.FC<Props> = ({ initialData, onSubmitSuccess }) => {
             </label>
             <input
               type="number"
-              name="estimatedTime"
+              name="estimatedTimeSec"
               onChange={handleChange}
-              value={formData.estimatedTime}
+              value={formData.estimatedTimeSec / 60}
               className="w-full border border-gray-300 p-2 rounded-md"
               min={0}
             />
