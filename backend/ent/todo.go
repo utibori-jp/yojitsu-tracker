@@ -18,25 +18,25 @@ type Todo struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// レコード作成日時
+	// Record creation date and time.
 	CreatedAt time.Time `json:"created_at,omitempty"`
-	// レコード最終更新日時
+	// Record last update date and time.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// タスクの名称
+	// Name of the task.
 	Name string `json:"name,omitempty"`
-	// タスクの詳細な説明
+	// Detailed description of the task.
 	Description *string `json:"description,omitempty"`
-	// タスク完了までの見積もり時間（分単位）
-	EstimatedTime int32 `json:"estimated_time,omitempty"`
-	// タスクに実際に費やした時間（分単位）
-	ActualTime *int32 `json:"actual_time,omitempty"`
-	// タスクの期日 (YYYY-MM-DD)
+	// Estimated time to complete the task in seconds.
+	EstimatedTimeSec int32 `json:"estimated_time_sec,omitempty"`
+	// Actual time spent on the task in seconds.
+	ActualTimeSec int32 `json:"actual_time_sec,omitempty"`
+	// Due date for the task (YYYY-MM-DD).
 	DueDate *time.Time `json:"due_date,omitempty"`
-	// タスクの優先度
+	// Priority of the task.
 	Priority todo.Priority `json:"priority,omitempty"`
-	// タスクの現在の状態
+	// Current status of the task.
 	Status todo.Status `json:"status,omitempty"`
-	// タスク完了時の振り返りメモ
+	// Reflection memo added upon task completion.
 	ReflectionMemo *string `json:"reflection_memo,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TodoQuery when eager-loading is set.
@@ -47,7 +47,7 @@ type Todo struct {
 
 // TodoEdges holds the relations/edges for other nodes in the graph.
 type TodoEdges struct {
-	// このTODOタスクの所有者ユーザー
+	// The user who owns this TODO task.
 	Owner *User `json:"owner,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
@@ -70,7 +70,7 @@ func (*Todo) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case todo.FieldID, todo.FieldEstimatedTime, todo.FieldActualTime:
+		case todo.FieldID, todo.FieldEstimatedTimeSec, todo.FieldActualTimeSec:
 			values[i] = new(sql.NullInt64)
 		case todo.FieldName, todo.FieldDescription, todo.FieldPriority, todo.FieldStatus, todo.FieldReflectionMemo:
 			values[i] = new(sql.NullString)
@@ -124,18 +124,17 @@ func (t *Todo) assignValues(columns []string, values []any) error {
 				t.Description = new(string)
 				*t.Description = value.String
 			}
-		case todo.FieldEstimatedTime:
+		case todo.FieldEstimatedTimeSec:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field estimated_time", values[i])
+				return fmt.Errorf("unexpected type %T for field estimated_time_sec", values[i])
 			} else if value.Valid {
-				t.EstimatedTime = int32(value.Int64)
+				t.EstimatedTimeSec = int32(value.Int64)
 			}
-		case todo.FieldActualTime:
+		case todo.FieldActualTimeSec:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field actual_time", values[i])
+				return fmt.Errorf("unexpected type %T for field actual_time_sec", values[i])
 			} else if value.Valid {
-				t.ActualTime = new(int32)
-				*t.ActualTime = int32(value.Int64)
+				t.ActualTimeSec = int32(value.Int64)
 			}
 		case todo.FieldDueDate:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -225,13 +224,11 @@ func (t *Todo) String() string {
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	builder.WriteString("estimated_time=")
-	builder.WriteString(fmt.Sprintf("%v", t.EstimatedTime))
+	builder.WriteString("estimated_time_sec=")
+	builder.WriteString(fmt.Sprintf("%v", t.EstimatedTimeSec))
 	builder.WriteString(", ")
-	if v := t.ActualTime; v != nil {
-		builder.WriteString("actual_time=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("actual_time_sec=")
+	builder.WriteString(fmt.Sprintf("%v", t.ActualTimeSec))
 	builder.WriteString(", ")
 	if v := t.DueDate; v != nil {
 		builder.WriteString("due_date=")

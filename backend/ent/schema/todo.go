@@ -39,17 +39,17 @@ func (Todo) Fields() []ent.Field {
 			Comment("Detailed description of the task."), // OpenAPI: Detailed description of the task.
 
 		// estimatedTime: OpenAPI: required, type: integer, format: int32, minimum: 1
-		field.Int32("estimated_time"). // Use Int32 according to format: int32
-						Min(1).                                                     // minimum: 1
-						Comment("Estimated time to complete the task in minutes."), // OpenAPI: Estimated time to complete the task in minutes.
+		field.Int32("estimated_time_sec"). // Use Int32 according to format: int32
+							Min(1).
+							Default(1).                                                 // minimum: 1
+							Comment("Estimated time to complete the task in seconds."), // OpenAPI: Estimated time to complete the task in seconds.
 
 		// actualTime: OpenAPI: type: integer, format: int32, minimum: 0
 		// (Optional/Nillable because it's not required in OpenAPI's Todo schema)
-		field.Int32("actual_time"). // format: int32
-						Min(0). // minimum: 0
-						Optional().
-						Nillable().
-						Comment("Actual time spent on the task in minutes."), // OpenAPI: Actual time spent on the task in minutes.
+		field.Int32("actual_time_sec"). // format: int32
+						Min(0).
+						Default(0).                                           // minimum: 0
+						Comment("Actual time spent on the task in seconds."), // OpenAPI: Actual time spent on the task in seconds.
 
 		// dueDate: OpenAPI: nullable: true, type: string, format: date
 		field.Time("due_date").
