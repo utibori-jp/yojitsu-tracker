@@ -7,7 +7,6 @@
     "ghcr.io/devcontainers/features/common-utils:2": {}
   },
   "postCreateCommand": "echo success",
-  "forwardPorts": [5173],
   "customizations": {
     "vscode": {
       "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint"],
