@@ -155,6 +155,7 @@ func (s *TodoService) CreateTodo(ctx context.Context, reqBody api.TodoCreationRe
 }
 
 // UpdateTodo updates an existing TODO item in the database.
+// It first fetches the todo, then applies the changes from the request body, and saves it back.
 func (s *TodoService) UpdateTodo(ctx context.Context, todoId int32, reqBody api.TodoUpdateRequest) (*api.Todo, error) {
 	// 1. Fetch the existing todo to ensure it exists.
 	existingTodo, err := s.client.Todo.Get(ctx, int(todoId))
@@ -172,6 +173,7 @@ func (s *TodoService) UpdateTodo(ctx context.Context, todoId int32, reqBody api.
 	// Note: oapi-codegen ensures minProperties: 1 for TodoUpdateRequest.
 	// The handler should have already validated this.
 
+	// Update Name if provided.
 	if reqBody.Name != nil {
 		if *reqBody.Name == "" { // Additional validation if needed, though schema has minLength
 			return nil, fmt.Errorf("%w: name cannot be empty when provided for update", ErrValidationFailed)
@@ -179,11 +181,13 @@ func (s *TodoService) UpdateTodo(ctx context.Context, todoId int32, reqBody api.
 		updateBuilder.SetName(*reqBody.Name)
 	}
 
+	// Update Description if provided.
 	if reqBody.Description != nil {
 		// SetNillableDescription handles both setting a value and setting to null.
 		updateBuilder.SetNillableDescription(reqBody.Description)
 	}
 
+	// Update EstimatedTimeSec if provided.
 	if reqBody.EstimatedTimeSec != nil {
 		if *reqBody.EstimatedTimeSec <= 0 { // Schema has minimum: 1
 			return nil, fmt.Errorf("%w: EstimatedTimeSec must be positive when provided for update", ErrValidationFailed)
@@ -192,12 +196,14 @@ func (s *TodoService) UpdateTodo(ctx context.Context, todoId int32, reqBody api.
 		updateBuilder.SetEstimatedTimeSec(*reqBody.EstimatedTimeSec)
 	}
 
+	// Update ActualTimeSec if provided.
 	if reqBody.ActualTimeSec != nil {
 		// ent.Todo.ActualTimeSec is *int32, reqBody.ActualTimeSec is *int32
 		// SetNillableActualTimeSec handles setting to a value or to null.
 		updateBuilder.SetNillableActualTimeSec(reqBody.ActualTimeSec)
 	}
 
+	// Update DueDate if provided.
 	if reqBody.DueDate != nil {
 		if reqBody.DueDate.IsZero() { // Treat zero date as clearing the due date
 			updateBuilder.ClearDueDate()
@@ -211,6 +217,7 @@ func (s *TodoService) UpdateTodo(ctx context.Context, todoId int32, reqBody api.
 		}
 	}
 
+	// Update Priority if provided.
 	if reqBody.Priority != nil {
 		p := todo.Priority(*reqBody.Priority)
 		if err := todo.PriorityValidator(p); err != nil {
@@ -219,6 +226,7 @@ func (s *TodoService) UpdateTodo(ctx context.Context, todoId int32, reqBody api.
 		updateBuilder.SetPriority(p)
 	}
 
+	// Update Status if provided.
 	if reqBody.Status != nil {
 		st := todo.Status(*reqBody.Status)
 		if err := todo.StatusValidator(st); err != nil {
@@ -227,6 +235,7 @@ func (s *TodoService) UpdateTodo(ctx context.Context, todoId int32, reqBody api.
 		updateBuilder.SetStatus(st)
 	}
 
+	// Update ReflectionMemo if provided.
 	if reqBody.ReflectionMemo != nil {
 		updateBuilder.SetNillableReflectionMemo(reqBody.ReflectionMemo)
 	}
