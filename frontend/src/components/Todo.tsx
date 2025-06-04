@@ -12,15 +12,15 @@ import { PRIORITY_LABELS } from "../constants/priority";
 import { STATUS_LABELS } from "../constants/status";
 import { timeFormat } from "../utils/timeFormat";
 import TodoForm from "./TodoForm";
+import { apiClient } from "../utils/apiClient";
 
 interface Props {
   todo: Todo;
 }
 
-const TodoItem: React.FC<Props> = ({ todo }) => {
+const TodoItem: React.FC<Props> = ({ todo: initialTodo }) => {
+  const [todo, setTodo] = useState<Todo>(initialTodo);
   const [isEditing, setIsEditing] = useState(false);
-  const [status, setStatus] = useState<Todo["status"]>(todo.status);
-  const [actualTimeSec, setActualTimeSec] = useState(todo.actualTimeSec ?? 0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // "TODO: 各ハンドルの実装"
@@ -28,29 +28,51 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
     console.log(`${todo.id}: Edit button clicked`);
     setIsEditing(true);
   };
-  const onCheck = () => {
+  const onCheck = async () => {
     console.log(`${todo.id}: Stop button clicked`);
-    // TODO: API call to update status
+    const updated = await apiClient.updateTodo(
+      { status: "done" },
+      {
+        params: { todoId: todo.id },
+      }
+    );
+    setTodo(updated);
   };
-  const onDelete = () => {
-    console.log(`${todo.id}: Delete button clicked`);
-    // TODO: API call to delete the todo
+  const onDelete = async () => {
+    await apiClient.deleteTodo(undefined, { params: { todoId: todo.id } });
   };
 
-  const handleStartStop = () => {
-    console.log(`${todo.id}: Start/Stop button clicked`);
-    // TODO: 時間測定処理とAPIcallの実装
-    if (status === "doing") {
-      setStatus("pending");
+  const handleStartStop = async () => {
+    if (todo.status === "doing") {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
-      // TODO: API call to update actualTimeSec
+      const updated = await apiClient.updateTodo(
+        { status: "pending", actualTimeSec: todo.actualTimeSec },
+        {
+          params: { todoId: todo.id },
+        }
+      );
+      setTodo(updated);
+      console.log(updated);
+      console.log(todo);
     } else {
-      setStatus("doing");
       intervalRef.current = setInterval(() => {
-        setActualTimeSec((prevTime) => prevTime + 1);
+        setTodo((prev) => ({
+          ...prev,
+          actualTimeSec: prev.actualTimeSec + 1,
+        }));
       }, 1000);
+      console.log(todo);
+      const updated = await apiClient.updateTodo(
+        { status: "doing" },
+        {
+          params: { todoId: todo.id },
+        }
+      );
+      console.log(todo);
+      console.log(updated);
+      setTodo(updated);
     }
   };
 
@@ -61,9 +83,12 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
     <div>
       <TodoForm
         initialData={todo}
-        onSubmitSuccess={() => {
+        onSubmitSuccess={(updatedTodo:Todo) => {
+          setTodo(updatedTodo)
           setIsEditing(false);
-          // TODO: データ更新 or 再フェッチ
+        }}
+        cancel={()=>{
+          setIsEditing(false);
         }}
       />
     </div>
@@ -73,7 +98,7 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
         <h2 className="text-xl font-bold">{todo.name}</h2>
         <div className="flex gap-2">
           <div>
-            {status === "todo" || status === "pending" ? (
+            {todo.status === "todo" || todo.status === "pending" ? (
               <IconButton
                 title="開始"
                 onClick={handleStartStop}
@@ -81,7 +106,7 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
                 color="text-green-600"
               />
             ) : null}
-            {status === "doing" ? (
+            {todo.status === "doing" ? (
               <IconButton
                 title="一時停止"
                 onClick={handleStartStop}
@@ -112,12 +137,13 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
       </div>
       <div className="flex space-x-4 mb-2">
         <div className={badgeClass}>{PRIORITY_LABELS[todo.priority]}</div>
-        <div className={badgeClass}>{STATUS_LABELS[status]}</div>
+        <div className={badgeClass}>{STATUS_LABELS[todo.status]}</div>
         <div>期限: {todo.dueDate}</div>
       </div>
       <div>
         <div>
-          予定: {todo.estimatedTimeSec} 分 / 実績: {timeFormat(actualTimeSec)}
+          予定: {todo.estimatedTimeSec / 60} 分 / 実績:{" "}
+          {timeFormat(todo.actualTimeSec)}
         </div>
       </div>
     </div>

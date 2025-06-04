@@ -5,7 +5,8 @@ import { PRIORITY_LABELS, PRIORITY_ORDER } from "../constants/priority";
 
 interface Props {
   initialData?: Todo; // 編集時用
-  onSubmitSuccess: (updatedTodo: Todo) => void;
+  onSubmitSuccess: (updated: Todo) => void;
+  cancel?: () => void;
 }
 
 const defaultFormData: TodoCreationRequest = {
@@ -16,7 +17,11 @@ const defaultFormData: TodoCreationRequest = {
   priority: "medium",
 };
 
-const TodoForm: React.FC<Props> = ({ initialData, onSubmitSuccess }) => {
+const TodoForm: React.FC<Props> = ({
+  initialData,
+  onSubmitSuccess,
+  cancel,
+}) => {
   const [formData, setFormData] = useState<TodoCreationRequest>(
     initialData ?? defaultFormData
   );
@@ -45,15 +50,21 @@ const TodoForm: React.FC<Props> = ({ initialData, onSubmitSuccess }) => {
     e.preventDefault();
     try {
       // TODO: エラーハンドリング
+      let updatedTodo: Todo | undefined;
       if (initialData) {
         // 編集モード
-        // await apiClient.updateTodo(initialData.id, formData);
+        updatedTodo = await apiClient.updateTodo(
+          {
+            ...formData,
+          },
+          { params: { todoId: initialData.id } }
+        );
       } else {
         // 新規作成
-        await apiClient.createTodo(formData);
+        updatedTodo = await apiClient.createTodo(formData);
       }
 
-      if (onSubmitSuccess) onSubmitSuccess();
+      onSubmitSuccess(updatedTodo);
 
       // フォームを初期化
       setFormData(defaultFormData);
@@ -149,7 +160,7 @@ const TodoForm: React.FC<Props> = ({ initialData, onSubmitSuccess }) => {
           </button>
           {initialData ? (
             <button
-              onClick={onSubmitSuccess}
+              onClick={cancel}
               className="w-full bg-gray-100 text-brack font-bold p-2 rounded-md hover:bg-gray-200 border border-gray-300"
             >
               キャンセル
