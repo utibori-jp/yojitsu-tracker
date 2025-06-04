@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 
+	"entgo.io/ent/dialect/sql/schema"
 	"github.com/utibori-jp/yojitsu-tracker/ent"
 	"github.com/utibori-jp/yojitsu-tracker/ent/migrate"
 	services "github.com/utibori-jp/yojitsu-tracker/internal/application/service"
@@ -45,7 +47,11 @@ func main() {
 	// Run the auto migration tool to create all schema resources.
 	// in the database based on the Ent schema definitions.
 	// This is typically done during application startup in development or as a separate migration step in production.
-	if err := client.Schema.Create(context.Background(), migrate.WithDropColumn(true), migrate.WithDropIndex(true)); err != nil {
+	var migrationOptions []schema.MigrateOption
+	if os.Getenv("APP_ENV") == "development" {
+		migrationOptions = append(migrationOptions, migrate.WithDropColumn(true), migrate.WithDropIndex(true))
+	}
+	if err := client.Schema.Create(context.Background(), migrationOptions...); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
