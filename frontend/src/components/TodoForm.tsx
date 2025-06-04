@@ -5,7 +5,7 @@ import { PRIORITY_LABELS, PRIORITY_ORDER } from "../constants/priority";
 
 interface Props {
   initialData?: Todo; // 編集時用
-  onSubmitSuccess?: () => void;
+  onSubmitSuccess: (updatedTodo: Todo) => void;
 }
 
 const defaultFormData: TodoCreationRequest = {
