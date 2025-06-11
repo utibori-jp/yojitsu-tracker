@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import type { TodoCreationRequest, Todo } from "../types/todo";
-import { apiClient } from "../utils/apiClient";
 import { PRIORITY_LABELS, PRIORITY_ORDER } from "../constants/priority";
 
 interface Props {
   initialData?: Todo; // 編集時用
-  onSubmitSuccess: (updated: Todo) => void;
+  onCreate?: (updated: TodoCreationRequest) => void;
+  onUpdate?: (updated: Todo) => void;
   cancel?: () => void;
 }
 
@@ -19,7 +19,8 @@ const defaultFormData: TodoCreationRequest = {
 
 const TodoForm: React.FC<Props> = ({
   initialData,
-  onSubmitSuccess,
+  onCreate,
+  onUpdate,
   cancel,
 }) => {
   const [formData, setFormData] = useState<TodoCreationRequest>(
@@ -48,23 +49,24 @@ const TodoForm: React.FC<Props> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const payload: TodoCreationRequest = {
+      ...formData,
+    };
+
     try {
       // TODO: エラーハンドリング
-      let updatedTodo: Todo | undefined;
-      if (initialData) {
+      if (initialData && onUpdate) {
         // 編集モード
-        updatedTodo = await apiClient.updateTodo(
-          {
-            ...formData,
-          },
-          { params: { todoId: initialData.id } }
-        );
-      } else {
+        const updated: Todo = {
+          ...initialData,
+          ...payload,
+          priority: payload.priority ?? "medium",
+        };
+        onUpdate(updated);
+      } else if (onCreate) {
         // 新規作成
-        updatedTodo = await apiClient.createTodo(formData);
+        onCreate(payload);
       }
-
-      onSubmitSuccess(updatedTodo);
 
       // フォームを初期化
       setFormData(defaultFormData);
