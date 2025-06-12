@@ -44,6 +44,8 @@ export default function Home() {
   };
 
   const handleDelete = async (id: number) => {
+    const confirmed = window.confirm("このタスクを削除してもよろしいですか？");
+    if (!confirmed) return;
     try {
       await apiClient.deleteTodo(undefined, {
         params: { todoId: id },
