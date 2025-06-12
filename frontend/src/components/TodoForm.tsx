@@ -56,7 +56,6 @@ const TodoForm: React.FC<Props> = ({
     e.preventDefault();
 
     try {
-      // TODO: エラーハンドリング
       if (initialData && onUpdate) {
         // 編集モード
         onUpdate(formData);
@@ -72,7 +71,6 @@ const TodoForm: React.FC<Props> = ({
         };
         onCreate(payload);
       }
-
       // フォームを初期化
       setFormData(defaultFormData);
     } catch (err) {
