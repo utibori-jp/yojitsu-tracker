@@ -9,12 +9,17 @@ interface Props {
   cancel?: () => void;
 }
 
-const defaultFormData: TodoCreationRequest = {
+const defaultFormData: Todo = {
+  id: 0,
   name: "",
   description: "",
   estimatedTimeSec: 60,
-  dueDate: undefined,
+  actualTimeSec: 0,
   priority: "medium",
+  status: "todo",
+  createdAt: "",
+  updatedAt: "",
+  reflectionMemo: undefined,
 };
 
 const TodoForm: React.FC<Props> = ({
@@ -23,7 +28,7 @@ const TodoForm: React.FC<Props> = ({
   onUpdate,
   cancel,
 }) => {
-  const [formData, setFormData] = useState<TodoCreationRequest>(
+  const [formData, setFormData] = useState<Todo>(
     initialData ?? defaultFormData
   );
 
@@ -49,22 +54,22 @@ const TodoForm: React.FC<Props> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const payload: TodoCreationRequest = {
-      ...formData,
-    };
 
     try {
       // TODO: エラーハンドリング
       if (initialData && onUpdate) {
         // 編集モード
-        const updated: Todo = {
-          ...initialData,
-          ...payload,
-          priority: payload.priority ?? "medium",
-        };
-        onUpdate(updated);
+        onUpdate(formData);
       } else if (onCreate) {
         // 新規作成
+        const payload: TodoCreationRequest = {
+          name: formData.name,
+          description: formData.description,
+          estimatedTimeSec: formData.estimatedTimeSec,
+          dueDate: formData.dueDate,
+          priority: formData.priority,
+          reflectionMemo: formData.reflectionMemo,
+        };
         onCreate(payload);
       }
 
@@ -142,7 +147,7 @@ const TodoForm: React.FC<Props> = ({
             <select
               name="priority"
               onChange={handleChange}
-              value={formData.priority ?? defaultFormData.priority ?? "medium"}
+              value={formData.priority}
               className="w-full border border-gray-300 p-2 rounded-md"
             >
               {PRIORITY_ORDER.map((priority) => (
@@ -153,6 +158,21 @@ const TodoForm: React.FC<Props> = ({
             </select>
           </div>
         </div>
+        {initialData?.status === "done" && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              反省メモ
+            </label>
+            <textarea
+              name="reflectionMemo"
+              value={formData.reflectionMemo ?? ""}
+              onChange={handleChange}
+              placeholder="このタスクの振り返り..."
+              className="w-full border border-gray-300 p-2 rounded-md"
+              rows={3}
+            />
+          </div>
+        )}
         <div className="flex gap-2">
           <button
             type="submit"
