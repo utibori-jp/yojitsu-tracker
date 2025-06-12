@@ -144,9 +144,8 @@ components:
           format: int32
           minimum: 0
           description: Actual time spent on the task in minutes. Can be set or updated. If omitted, defaults to 0.
-          # nullable: true # Remove nullable
+          nullable: true
           example: 75
-          default: 0
         dueDate:
           type: string
           format: date
@@ -192,6 +191,38 @@ paths:
       operationId: listTodos
       tags:
         - Todos
+      parameters:
+        - name: status
+          in: query
+          description: Filter by task status.
+          required: false
+          schema:
+            type: string
+            enum: [todo, doing, pending, done]
+          example: "todo"
+        - name: priority
+          in: query
+          description: Filter by task priority.
+          required: false
+          schema:
+            type: string
+            enum: [high, medium, low]
+          example: "high"
+        - name: dueDate
+          in: query
+          description: Filter by due date (YYYY-MM-DD).
+          required: false
+          schema:
+            type: string
+            format: date
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
+          example: "2025-05-20"
+        - name: name
+          in: query
+          description: Filter by task name (partial match, case-insensitive).
+          required: false
+          schema:
+            type: string
       responses:
         "200":
           description: A list of TODOs.
@@ -207,7 +238,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  # Path for creating a new TODO item, conventionally POST to the collection URI /todos
+    # Path for creating a new TODO item, conventionally POST to the collection URI /todos
     post:
       summary: Create a new TODO
       description: Adds a new TODO item to the list.
