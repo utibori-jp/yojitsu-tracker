@@ -37,7 +37,7 @@ const TodoUpdateRequest = z
     name: z.string().min(1).max(255),
     description: z.string().max(1000).nullable(),
     estimatedTimeSec: z.number().int().gte(1),
-    actualTimeSec: z.number().int().gte(0).default(0),
+    actualTimeSec: z.number().int().gte(0).nullable(),
     dueDate: z
       .string()
       .regex(/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/)
@@ -63,6 +63,31 @@ const endpoints = makeApi([
     alias: "listTodos",
     description: `Retrieves a list of all TODO items.`,
     requestFormat: "json",
+    parameters: [
+      {
+        name: "status",
+        type: "Query",
+        schema: z.enum(["todo", "doing", "pending", "done"]).optional(),
+      },
+      {
+        name: "priority",
+        type: "Query",
+        schema: z.enum(["high", "medium", "low"]).optional(),
+      },
+      {
+        name: "dueDate",
+        type: "Query",
+        schema: z
+          .string()
+          .regex(/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/)
+          .optional(),
+      },
+      {
+        name: "name",
+        type: "Query",
+        schema: z.string().optional(),
+      },
+    ],
     response: z.array(Todo),
     errors: [
       {
