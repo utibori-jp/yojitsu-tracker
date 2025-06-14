@@ -3,7 +3,11 @@ import TodoForm from "../components/TodoForm";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { useState, useEffect } from "react";
-import type { Todo, TodoCreationRequest } from "../types/todo";
+import type {
+  Todo,
+  TodoCreationRequest,
+  TodoUpdateRequest,
+} from "../types/todo";
 import { apiClient } from "../utils/apiClient";
 
 export default function Home() {
@@ -32,7 +36,8 @@ export default function Home() {
 
   const handleUpdate = async (updated: Todo) => {
     try {
-      const updatedTodo = await apiClient.updateTodo(updated, {
+      const payload: TodoUpdateRequest = { ...updated };
+      const updatedTodo = await apiClient.updateTodo(payload, {
         params: { todoId: updated.id },
       });
       setTodos((prev) =>
