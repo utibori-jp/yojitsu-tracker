@@ -77,13 +77,29 @@ func toAPITodos(entTodos []*ent.Todo) []api.Todo {
 }
 
 // ListTodos returns a list of TODO items from the database.
-func (s *TodoService) ListTodos(ctx context.Context) ([]api.Todo, error) {
-	// Query all todos from the database.
-	entTodos, err := s.client.Todo.
-		Query().
-		// TODO: Add filtering or pagination as needed.
-		// Order(ent.Desc(todo.FieldCreatedAt)). // Example: Order by creation date descending.
-		All(ctx)
+func (s *TodoService) ListTodos(ctx context.Context, params api.ListTodosParams) ([]api.Todo, error) {
+	query := s.client.Todo.Query()
+
+	if params.Status != nil {
+		query.Where(todo.StatusEQ(todo.Status(*params.Status)))
+	}
+	if params.Priority != nil {
+		query.Where(todo.PriorityEQ(todo.Priority(*params.Priority)))
+	}
+	if params.DueDate != nil {
+		dueDateStr := params.DueDate.Format("2006-01-02") // Format types.Date to string
+		dueDate, err := time.Parse("2006-01-02", dueDateStr)
+		if err != nil {
+			// TODO: Handle the error when the date format is invalid.
+		} else {
+			query.Where(todo.DueDateEQ(dueDate))
+		}
+	}
+	if params.Name != nil {
+		query.Where(todo.NameContainsFold(*params.Name))
+	}
+
+	entTodos, err := query.All(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list todos from database: %w", err)
 	}
@@ -108,7 +124,8 @@ func (s *TodoService) CreateTodo(ctx context.Context, reqBody api.TodoCreationRe
 	// 2. Prepare ent's Create builder.
 	createBuilder := s.client.Todo.Create().
 		SetName(reqBody.Name).
-		SetEstimatedTimeSec(reqBody.EstimatedTimeSec)
+		SetEstimatedTimeSec(reqBody.EstimatedTimeSec).
+		SetStatus(todo.StatusTodo)
 
 	// Set optional fields.
 	if reqBody.Description != nil {

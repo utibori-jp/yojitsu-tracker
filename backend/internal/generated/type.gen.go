@@ -31,9 +31,9 @@ const (
 
 // Defines values for TodoUpdateRequestPriority.
 const (
-	High   TodoUpdateRequestPriority = "high"
-	Low    TodoUpdateRequestPriority = "low"
-	Medium TodoUpdateRequestPriority = "medium"
+	TodoUpdateRequestPriorityHigh   TodoUpdateRequestPriority = "high"
+	TodoUpdateRequestPriorityLow    TodoUpdateRequestPriority = "low"
+	TodoUpdateRequestPriorityMedium TodoUpdateRequestPriority = "medium"
 )
 
 // Defines values for TodoUpdateRequestStatus.
@@ -42,6 +42,21 @@ const (
 	TodoUpdateRequestStatusDone    TodoUpdateRequestStatus = "done"
 	TodoUpdateRequestStatusPending TodoUpdateRequestStatus = "pending"
 	TodoUpdateRequestStatusTodo    TodoUpdateRequestStatus = "todo"
+)
+
+// Defines values for ListTodosParamsStatus.
+const (
+	ListTodosParamsStatusDoing   ListTodosParamsStatus = "doing"
+	ListTodosParamsStatusDone    ListTodosParamsStatus = "done"
+	ListTodosParamsStatusPending ListTodosParamsStatus = "pending"
+	ListTodosParamsStatusTodo    ListTodosParamsStatus = "todo"
+)
+
+// Defines values for ListTodosParamsPriority.
+const (
+	ListTodosParamsPriorityHigh   ListTodosParamsPriority = "high"
+	ListTodosParamsPriorityLow    ListTodosParamsPriority = "low"
+	ListTodosParamsPriorityMedium ListTodosParamsPriority = "medium"
 )
 
 // Error defines model for Error.
@@ -110,7 +125,7 @@ type TodoCreationRequestPriority string
 // TodoUpdateRequest Schema for updating an existing TODO item. At least one field must be provided.
 type TodoUpdateRequest struct {
 	// ActualTimeSec Actual time spent on the task in minutes. Can be set or updated. If omitted, defaults to 0.
-	ActualTimeSec *int32 `json:"actualTimeSec,omitempty"`
+	ActualTimeSec *int32 `json:"actualTimeSec"`
 
 	// Description Detailed description of the task.
 	Description *string `json:"description"`
@@ -139,6 +154,27 @@ type TodoUpdateRequestPriority string
 
 // TodoUpdateRequestStatus Current status of the task.
 type TodoUpdateRequestStatus string
+
+// ListTodosParams defines parameters for ListTodos.
+type ListTodosParams struct {
+	// Status Filter by task status.
+	Status *ListTodosParamsStatus `form:"status,omitempty" json:"status,omitempty"`
+
+	// Priority Filter by task priority.
+	Priority *ListTodosParamsPriority `form:"priority,omitempty" json:"priority,omitempty"`
+
+	// DueDate Filter by due date (YYYY-MM-DD).
+	DueDate *openapi_types.Date `form:"dueDate,omitempty" json:"dueDate,omitempty"`
+
+	// Name Filter by task name (partial match, case-insensitive).
+	Name *string `form:"name,omitempty" json:"name,omitempty"`
+}
+
+// ListTodosParamsStatus defines parameters for ListTodos.
+type ListTodosParamsStatus string
+
+// ListTodosParamsPriority defines parameters for ListTodos.
+type ListTodosParamsPriority string
 
 // CreateTodoJSONRequestBody defines body for CreateTodo for application/json ContentType.
 type CreateTodoJSONRequestBody = TodoCreationRequest

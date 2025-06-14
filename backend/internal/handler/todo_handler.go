@@ -25,9 +25,10 @@ func NewTodoHandler(todoService *services.TodoService) *TodoHandler {
 
 // ListTodos handles GET /todos requests.
 // It retrieves all TODO items using the TodoService and returns them as a JSON response.
-func (h *TodoHandler) ListTodos(w http.ResponseWriter, r *http.Request) {
+func (h *TodoHandler) ListTodos(w http.ResponseWriter, r *http.Request, params api.ListTodosParams) {
+
 	// Call the service to get the list of todos.
-	todos, err := h.todoService.ListTodos(r.Context())
+	todos, err := h.todoService.ListTodos(r.Context(), params)
 	if err != nil {
 		// Log the error and send a generic server error response.
 		log.Printf("Error listing todos: %v", err)
