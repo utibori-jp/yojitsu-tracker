@@ -67,7 +67,6 @@ const TodoForm: React.FC<Props> = ({
           estimatedTimeSec: formData.estimatedTimeSec,
           dueDate: formData.dueDate,
           priority: formData.priority,
-          reflectionMemo: formData.reflectionMemo,
         };
         onCreate(payload);
       }
