@@ -181,7 +181,7 @@ const TodoForm: React.FC<Props> = ({
           {initialData ? (
             <button
               onClick={cancel}
-              className="w-full bg-gray-100 text-brack font-bold p-2 rounded-md hover:bg-gray-200 border border-gray-300"
+              className="w-full bg-gray-100 text-black font-bold p-2 rounded-md hover:bg-gray-200 border border-gray-300"
             >
               キャンセル
             </button>
