@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import type { Todo } from "../types/todo";
 import {
   PencilIcon,
@@ -29,6 +29,15 @@ const TodoItem: React.FC<Props> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [showReflectionModal, setShowReflectionModal] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, []);
 
   const onEdit = () => {
     console.log(`${todo.id}: Edit button clicked`);
