@@ -1,14 +1,19 @@
 import { useNavigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 
 export default function Home() {
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // 本来はここにGoogleログイン処理を入れる
-    console.log("ログインボタンがクリックされました");
-    // 認証後に /dashboard へ遷移する想定
-    navigate("/dashboard");
-  };
+  const login = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      // ここでトークンを保存するなど（例: localStorage）
+      localStorage.setItem("access_token", tokenResponse.access_token);
+      navigate("/dashboard");
+    },
+    onError: (errorResponse) => {
+      console.error("Googleログイン失敗:", errorResponse);
+    },
+  });
 
   return (
     <main className="bg-gray-200 min-h-screen">
@@ -24,7 +29,7 @@ export default function Home() {
         </p>
 
         <button
-          onClick={handleLogin}
+          onClick={() => login()}
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow"
         >
           Googleでログイン
