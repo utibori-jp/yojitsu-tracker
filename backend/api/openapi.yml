@@ -170,6 +170,27 @@ components:
           maxLength: 2000
           nullable: true
           example: "Further research needed for section 3."
+    User:
+      type: object
+      description: Schema for user information.
+      required:
+        - id
+        - name
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the user.
+          readOnly: true
+          example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+        name:
+          type: string
+          description: Name of the user.
+          example: "John Doe"
+        email:
+          type: string
+          description: Email address of the user.
 
     Error:
       type: object
@@ -332,6 +353,72 @@ paths:
                 $ref: "#/components/schemas/Error"
         "500":
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /auth/login:
+    post:
+      summary: OAuth Callback & Login
+      description: Receives authorization code and exchanges it for an app session (JWT).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                authorizationCode:
+                  type: string
+                codeVerifier:
+                  type: string
+      responses:
+        '200':
+          description: Login successful. Sets JWT in an HttpOnly cookie and returns user info.
+          headers:
+            Set-Cookie:
+              description: |
+                Contains the JWT for session management.
+                The cookie should be set with HttpOnly, Secure, and SameSite=Strict attributes for security.
+              schema:
+                type: string
+                example: "session-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; Path=/; HttpOnly; Secure; SameSite=Strict"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Authentication failed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /auth/status:
+    get:
+      summary: Get Current User Info
+      description: Checks the session cookie and returns the current user's data if logged in.
+      responses:
+        '200':
+          description: User is authenticated. Returns user data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: User is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /auth/logout:
+    post:
+      summary: Logout User
+      description: Clears the session cookie to log the user out.
+      responses:
+        '204':
+          description: Logout successful. No content returned.
+        '401':
+          description: User is not authenticated.
           content:
             application/json:
               schema:
