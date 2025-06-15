@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import type { Todo } from "../types/todo";
 import {
   PencilIcon,
@@ -10,44 +10,108 @@ import {
 import IconButton from "./IconButton";
 import { PRIORITY_LABELS } from "../constants/priority";
 import { STATUS_LABELS } from "../constants/status";
+import { timeFormat } from "../utils/timeFormat";
+import TodoForm from "./TodoForm";
+import ReflectionMemoModal from "./ReflectionMemoModal";
 
 interface Props {
   todo: Todo;
+  onUpdate: (updated: Todo) => void;
+  onDelete: (id: number) => void;
 }
 
-const TodoItem: React.FC<Props> = ({ todo }) => {
-  const [status, setStatus] = useState<Todo["status"]>(todo.status);
-  // "TODO: 各ハンドルの実装"
+const TodoItem: React.FC<Props> = ({
+  todo: initialTodo,
+  onUpdate,
+  onDelete,
+}) => {
+  const [todo, setTodo] = useState<Todo>(initialTodo);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showReflectionModal, setShowReflectionModal] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, []);
+
   const onEdit = () => {
     console.log(`${todo.id}: Edit button clicked`);
-  };
-  const onCheck = () => {
-    console.log(`${todo.id}: Stop button clicked`);
-  };
-  const onDelete = () => {
-    console.log(`${todo.id}: Delete button clicked`);
+    setIsEditing(true);
   };
 
-  const handleStartStop = () => {
-    console.log(`${todo.id}: Start/Stop button clicked`);
-    // TODO: 時間測定処理とAPIcallの実装
-    if (status === "doing") {
-      setStatus("pending");
+  const onCheck = async () => {
+    setShowReflectionModal(true);
+  };
+
+  const handleStartStop = async () => {
+    if (todo.status === "doing") {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      const updated: Todo = {
+        ...todo,
+        status: "pending",
+        actualTimeSec: todo.actualTimeSec,
+      };
+      setTodo(updated);
+      onUpdate(updated);
+      console.log(updated);
+      console.log(todo);
     } else {
-      setStatus("doing");
+      intervalRef.current = setInterval(() => {
+        setTodo((prev) => ({
+          ...prev,
+          actualTimeSec: prev.actualTimeSec + 1,
+        }));
+      }, 1000);
+      const updated: Todo = { ...todo, status: "doing" };
+      setTodo(updated);
+      onUpdate(updated);
     }
   };
 
-  // className definition
+  const handleSubmitReflection = (memo: string) => {
+    const updatedTodo: Todo = {
+      ...todo,
+      status: "done",
+      reflectionMemo: memo,
+    };
+    setTodo(updatedTodo);
+    onUpdate(updatedTodo);
+    setShowReflectionModal(false);
+  };
+  const handleCancelReflection = () => {
+    setShowReflectionModal(false);
+  };
+
   const badgeClass = "border rounded px-1";
 
-  return (
+  return isEditing ? (
+    <div>
+      <TodoForm
+        initialData={todo}
+        onUpdate={(updatedTodo: Todo) => {
+          setTodo(updatedTodo);
+          onUpdate(updatedTodo);
+          setIsEditing(false);
+        }}
+        cancel={() => {
+          setIsEditing(false);
+        }}
+      />
+    </div>
+  ) : (
     <div className="border border-gray-300 rounded-xl p-4 shadow-md bg-white mb-2">
       <div className="mb-2 flex justify-between items-center">
         <h2 className="text-xl font-bold">{todo.name}</h2>
         <div className="flex gap-2">
           <div>
-            {status === "todo" || status === "pending" ? (
+            {todo.status === "todo" || todo.status === "pending" ? (
               <IconButton
                 title="開始"
                 onClick={handleStartStop}
@@ -55,7 +119,7 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
                 color="text-green-600"
               />
             ) : null}
-            {status === "doing" ? (
+            {todo.status === "doing" ? (
               <IconButton
                 title="一時停止"
                 onClick={handleStartStop}
@@ -64,15 +128,17 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
               />
             ) : null}
           </div>
-          <IconButton
-            title="完了"
-            onClick={onCheck}
-            icon={CheckCircleIcon}
-            color="text-purple-600"
-          />
+          {todo.status !== "done" ? (
+            <IconButton
+              title="完了"
+              onClick={onCheck}
+              icon={CheckCircleIcon}
+              color="text-purple-600"
+            />
+          ) : null}
           <IconButton
             title="削除"
-            onClick={onDelete}
+            onClick={() => onDelete(todo.id)}
             icon={TrashIcon}
             color="text-red-600"
           />
@@ -86,14 +152,25 @@ const TodoItem: React.FC<Props> = ({ todo }) => {
       </div>
       <div className="flex space-x-4 mb-2">
         <div className={badgeClass}>{PRIORITY_LABELS[todo.priority]}</div>
-        <div className={badgeClass}>{STATUS_LABELS[status]}</div>
+        <div className={badgeClass}>{STATUS_LABELS[todo.status]}</div>
         <div>期限: {todo.dueDate}</div>
       </div>
-      <div>
-        <div>
-          予定: {todo.estimatedTime} 分 / 実績: {todo.actualTime} 分
-        </div>
+      {todo.description ? (
+        <div className="mb-2">詳細: {todo.description}</div>
+      ) : null}
+
+      <div className="mb-2">
+        予定: {todo.estimatedTimeSec / 60} 分 / 実績:{" "}
+        {timeFormat(todo.actualTimeSec)}
       </div>
+      {todo.status === "done" ? (
+        <div>反省メモ: {todo?.reflectionMemo}</div>
+      ) : null}
+      <ReflectionMemoModal
+        isOpen={showReflectionModal}
+        onClose={handleCancelReflection}
+        onSubmit={handleSubmitReflection}
+      />
     </div>
   );
 };

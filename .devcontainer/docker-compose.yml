@@ -8,8 +8,6 @@ services:
     command: sleep infinity
     networks:
       - app-network
-    ports:
-      - "5173:5173"
   backend:
     build:
       context: .
@@ -22,7 +20,7 @@ services:
     networks:
       - app-network
     ports:
-      - "8000:8000"
+      - "8080:8080"
   database:
     image: postgres:16
     container_name: database

@@ -1,10 +1,69 @@
-import React from "react";
 import TodoList from "../components/TodoList";
 import TodoForm from "../components/TodoForm";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
+import { useState, useEffect } from "react";
+import type {
+  Todo,
+  TodoCreationRequest,
+  TodoUpdateRequest,
+} from "../types/todo";
+import { apiClient } from "../utils/apiClient";
 
-const Home: React.FC = () => {
+export default function Home() {
+  const [todos, setTodos] = useState<Todo[]>([]);
+
+  useEffect(() => {
+    const fetchTodos = async () => {
+      try {
+        const data = await apiClient.listTodos();
+        setTodos(data);
+      } catch (error) {
+        console.error("Error fetching todos:", error);
+      }
+    };
+    fetchTodos();
+  }, []);
+
+  const handleCreate = async (fields: TodoCreationRequest) => {
+    try {
+      const newTodo = await apiClient.createTodo(fields);
+      setTodos((prev) => [...prev, newTodo]);
+    } catch (error) {
+      console.error("Create failed", error);
+    }
+  };
+
+  const handleUpdate = async (updated: Todo) => {
+    try {
+      const payload: TodoUpdateRequest = { ...updated };
+      const updatedTodo = await apiClient.updateTodo(payload, {
+        params: { todoId: updated.id },
+      });
+      setTodos((prev) =>
+        prev.map((todo) => (todo.id === updated.id ? updatedTodo : todo))
+      );
+    } catch (error) {
+      console.error("Update failed", error);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    const confirmed = window.confirm("このタスクを削除してもよろしいですか？");
+    if (!confirmed) return;
+    try {
+      await apiClient.deleteTodo(undefined, {
+        params: { todoId: id },
+      });
+      setTodos((prev) => prev.filter((todo) => todo.id !== id));
+    } catch (error) {
+      console.error("Delete failed", error);
+    }
+  };
+
+  const doingTodos = todos.filter((todo) => todo.status !== "done");
+  const doneTodos = todos.filter((todo) => todo.status === "done");
+
   return (
     <main className="bg-gray-200 min-h-screen">
       <div className="bg-gray-800 p-4 shadow-md">
@@ -21,16 +80,22 @@ const Home: React.FC = () => {
 
         <TabPanel>
           <div className="space-y-4 mt-4">
-            <TodoForm />
-            <TodoList />
+            <TodoForm onCreate={handleCreate} />
+            <TodoList
+              todos={doingTodos}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+            />
           </div>
         </TabPanel>
         <TabPanel>
-          <h2>コンテンツ未実装</h2>
+          <TodoList
+            todos={doneTodos}
+            onUpdate={handleUpdate}
+            onDelete={handleDelete}
+          />
         </TabPanel>
       </Tabs>
     </main>
   );
-};
-
-export default Home;
+}
