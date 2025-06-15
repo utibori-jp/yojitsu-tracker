@@ -10,7 +10,7 @@ import type {
 } from "../types/todo";
 import { apiClient } from "../utils/apiClient";
 
-export default function Home() {
+export default function Dashboard() {
   const [todos, setTodos] = useState<Todo[]>([]);
 
   useEffect(() => {
